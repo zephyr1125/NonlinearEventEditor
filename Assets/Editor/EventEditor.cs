@@ -6,6 +6,8 @@ public class EventEditor : EditorWindow
 
     private Event _currentEvent;
 
+    private float _sliderValue = 1;
+
     [MenuItem("DajiaGame/EventEditor")]
     static void OnInit()
     {
@@ -14,17 +16,18 @@ public class EventEditor : EditorWindow
 
     void OnGUI()
     {
+
         _currentEvent = Event.current;
-        GUILayout.BeginArea(new Rect(0, 0, 512, 512));
-        if (_currentEvent.type == EventType.Repaint)
-        {
+        if (_currentEvent.type == EventType.Repaint) {
             GUIStyle canvasBackground = "flow background";
             canvasBackground.Draw(new Rect(0, 0, 512, 512), false, false, false, false);
             Utils.DrawGrid();
-            DrawNode(0);
-            DrawNode(1);
+            //DrawNode(0);
+            //DrawNode(1);
+
         }
-        GUILayout.EndArea();
+
+        _sliderValue = Utils.MyCustomSlider(new Rect(64, 64, 128, 128), _sliderValue, new GUIStyle("flow node 0"));
     }
 
     private void DrawNode(int id)
