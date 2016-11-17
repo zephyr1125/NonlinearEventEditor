@@ -8,6 +8,8 @@ public class EventEditor : EditorWindow
 
     private float _sliderValue = 1;
 
+    private Rect _nodeRect = new Rect(64, 64, 128, 128);
+
     [MenuItem("DajiaGame/EventEditor")]
     static void OnInit()
     {
@@ -22,12 +24,14 @@ public class EventEditor : EditorWindow
             GUIStyle canvasBackground = "flow background";
             canvasBackground.Draw(new Rect(0, 0, 512, 512), false, false, false, false);
             Utils.DrawGrid();
-            //DrawNode(0);
-            //DrawNode(1);
 
         }
 
-        _sliderValue = Utils.MyCustomSlider(new Rect(64, 64, 128, 128), _sliderValue, new GUIStyle("flow node 0"));
+        GUIStyle style = "flow node 0";
+
+        Utils.Node(ref _nodeRect, style);
+
+        Repaint();
     }
 
     private void DrawNode(int id)

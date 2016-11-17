@@ -1,4 +1,5 @@
 ﻿
+using UnityEditor;
 using UnityEngine;
 
 public class Utils
@@ -30,45 +31,30 @@ public class Utils
         GL.Vertex(p2);
     }
 
-    public static float MyCustomSlider(Rect controlRect, float value, GUIStyle style)
+    public static void Node(ref Rect controlRect, GUIStyle style)
     {
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
         switch (Event.current.GetTypeForControl(controlID))
         {
             case EventType.Repaint:
-                Debug.Log("Repaint");
-                int pixelWidth = (int) Mathf.Lerp(8f, controlRect.width, value);
-                Rect targetRect = new Rect(controlRect) {width = pixelWidth};
-                GUI.color = Color.Lerp(Color.red, Color.green, value);
-                GUI.DrawTexture(targetRect, style.normal.background);
+                GUI.DrawTexture(controlRect, style.normal.background);
                 GUI.color = Color.white;
                 break;
 
             case EventType.mouseDown:
                 if (controlRect.Contains(Event.current.mousePosition) && Event.current.button == 0)
                 {
-                    Debug.Log("Start Control");
                     GUIUtility.hotControl = controlID;
+                    controlRect.x += 8;
                 }
                 break;
 
             case EventType.mouseUp:
                 if (GUIUtility.hotControl == controlID)
                 {
-                    Debug.Log("End Control");
                     GUIUtility.hotControl = 0;
                 }
                 break;
         }
-
-        if (Event.current.isMouse && GUIUtility.hotControl == controlID)
-        {
-            float relativeX = Event.current.mousePosition.x - controlRect.x;
-            value = Mathf.Clamp01(relativeX/controlRect.width);
-            Debug.Log("value to"+ value);
-            GUI.changed = true;
-            Event.current.Use();
-        }
-        return value;
     }
 }
