@@ -4,11 +4,15 @@ using UnityEditor;
 public class EventEditor : EditorWindow
 {
 
-    private Event _currentEvent;
-
     private float _sliderValue = 1;
 
-    private Rect _nodeRect = new Rect(64, 64, 256, 128);
+    private Rect _canvasRect = new Rect(0, 0, 2048, 2048);
+
+    private Rect _nodeRect = new Rect(64, 64, 320, 192);
+
+    private int _gridSize = 64;
+
+    private Vector2 _offset = Vector2.zero;
 
     [MenuItem("DajiaGame/EventEditor")]
     static void OnInit()
@@ -17,15 +21,8 @@ public class EventEditor : EditorWindow
     }
 
     void OnGUI()
-    {
-
-        _currentEvent = Event.current;
-        if (_currentEvent.type == EventType.Repaint) {
-            GUIStyle canvasBackground = "flow background";
-            canvasBackground.Draw(new Rect(0, 0, 512, 512), false, false, false, false);
-            Utils.DrawGrid();
-
-        }
+    {   
+        Background();
 
         GUIStyle style = "flow node 0";
 
@@ -34,16 +31,49 @@ public class EventEditor : EditorWindow
         Repaint();
     }
 
-    private void Node(ref Rect controlRect, GUIStyle style)
+#region background
+
+    private void Background()
     {
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
         switch (Event.current.GetTypeForControl(controlID)) {
             case EventType.Repaint:
-                DrawNode(controlRect, style);
+                DrawBackground();
+                break;
+            case EventType.MouseDrag:
+                if (Event.current.button == 2)
+                {
+                    //中键拖拽整个工作区
+                    _offset += Event.current.delta;
+                }
+                break;
+
+        }
+    }
+
+    private void DrawBackground()
+    {
+        Rect drawRect = new Rect(_canvasRect.position + _offset, _canvasRect.size);
+        GUIStyle canvasBackground = "flow background";
+        canvasBackground.Draw(drawRect, false, false, false, false);
+        Utils.DrawGrid(drawRect, _gridSize);
+    }
+
+#endregion
+
+#region node
+
+    private void Node(ref Rect controlRect, GUIStyle style)
+    {
+        Rect drawRect = new Rect(controlRect.position + _offset, controlRect.size);
+        int controlID = GUIUtility.GetControlID(FocusType.Passive);
+        switch (Event.current.GetTypeForControl(controlID)) {
+            case EventType.Repaint:
+                DrawNode(drawRect, style);
                 break;
 
             case EventType.MouseDown:
-                if (controlRect.Contains(Event.current.mousePosition) && Event.current.button == 0) {
+                if (drawRect.Contains(Event.current.mousePosition) && Event.current.button == 0) {
                     GUIUtility.hotControl = controlID;
                 }
                 break;
@@ -53,10 +83,10 @@ public class EventEditor : EditorWindow
                 {
                     //左键抬起
                     GUIUtility.hotControl = 0;
-                    controlRect.center = new Vector2(((int) controlRect.center.x/64)*64,
-                        ((int) controlRect.center.y/64)*64);
+                    controlRect = new Rect((int)(controlRect.x+_gridSize/2)/_gridSize* _gridSize,
+                        (int)(controlRect.y + _gridSize / 2) / _gridSize * _gridSize, controlRect.width, controlRect.height);
                 }
-                if (controlRect.Contains(Event.current.mousePosition) && Event.current.button == 1) {
+                if (drawRect.Contains(Event.current.mousePosition) && Event.current.button == 1) {
                     //右键抬起
                     ShowNodeMenu();
                 }
@@ -71,11 +101,11 @@ public class EventEditor : EditorWindow
 
     private void DrawNode(Rect controlRect, GUIStyle style)
     {
-        //GUI.DrawTexture(controlRect, style.normal.background);
-        GUI.Label(controlRect, "", style);
-        GUI.Label(new Rect(controlRect.x + 8, controlRect.y + 8, controlRect.width - 16, 16), "这里是标题");
-        GUI.TextArea(new Rect(controlRect.x + 8, controlRect.y + 24, controlRect.width - 16, 64),
-            "你无法摆脱恐惧。它就像大自然，你赢不了也逃不了，但只要撑过去，你就会了解你的潜力。");
+        Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);
+        GUI.Label(drawRect, "", style);
+        GUI.Label(new Rect(drawRect.x + 8, drawRect.y + 8, drawRect.width - 16, 16), "这里是标题");
+        GUI.TextArea(new Rect(drawRect.x + 8, drawRect.y + 24, drawRect.width - 16, 48),
+            "本电子邮件为系统自动发送，请勿直接回复。如有问题，请回复邮箱至");
 
         GUI.color = Color.white;
     }
@@ -91,4 +121,7 @@ public class EventEditor : EditorWindow
         });
         menu.ShowAsContext();
     }
+
+#endregion
+
 }

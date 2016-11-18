@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class Utils
 {
-    public static void DrawGrid()
+    public static void DrawGrid(Rect rect, int grid)
     {
         GL.PushMatrix();
         GL.Begin(1);
-        DrawGridLines(new Rect(0, 0, 512, 512), 64, new Vector2(0, 0), Color.white);
-        DrawGridLines(new Rect(0, 0, 512, 512), 64, new Vector2(0, 0), Color.white);
+        DrawGridLines(rect, grid, new Vector2(0, 0), Color.white);
+        DrawGridLines(rect, grid, new Vector2(0, 0), Color.white);
         GL.End();
         GL.PopMatrix();
     }
