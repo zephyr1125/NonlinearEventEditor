@@ -14,20 +14,25 @@ public class EventEditor : EditorWindow
 
     private Vector2 _offset = Vector2.zero;
 
+    private GUISkin _skin;
+
     [MenuItem("DajiaGame/EventEditor")]
     static void OnInit()
     {
         GetWindow<EventEditor>();
     }
 
+    void Awake()
+    {
+        _skin = AssetDatabase.LoadAssetAtPath<GUISkin>("Assets/Editor/NonlinearEventEditor.guiskin");
+    }
+
     void OnGUI()
-    {   
+    {
         Background();
-
-        GUIStyle style = "flow node 0";
-
-        Node(ref _nodeRect, style);
-
+        GUI.skin = _skin;
+        Node(ref _nodeRect);
+        GUI.skin = null;
         Repaint();
     }
 
@@ -63,13 +68,13 @@ public class EventEditor : EditorWindow
 
 #region node
 
-    private void Node(ref Rect controlRect, GUIStyle style)
+    private void Node(ref Rect controlRect)
     {
         Rect drawRect = new Rect(controlRect.position + _offset, controlRect.size);
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
         switch (Event.current.GetTypeForControl(controlID)) {
             case EventType.Repaint:
-                DrawNode(drawRect, style);
+                DrawNode(drawRect);
                 break;
 
             case EventType.MouseDown:
@@ -99,13 +104,13 @@ public class EventEditor : EditorWindow
         }
     }
 
-    private void DrawNode(Rect controlRect, GUIStyle style)
+    private void DrawNode(Rect controlRect)
     {
         Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);
-        GUI.Label(drawRect, "", style);
-        GUI.Label(new Rect(drawRect.x + 8, drawRect.y + 8, drawRect.width - 16, 16), "这里是标题");
-        GUI.TextArea(new Rect(drawRect.x + 8, drawRect.y + 24, drawRect.width - 16, 48),
-            "本电子邮件为系统自动发送，请勿直接回复。如有问题，请回复邮箱至");
+        GUI.Label(drawRect, "", _skin.GetStyle("Node"));
+        GUI.Label(new Rect(drawRect.x, drawRect.y, drawRect.width, 24), "这里是标题", _skin.GetStyle("Title"));
+        GUI.TextArea(new Rect(drawRect.x, drawRect.y + 23, drawRect.width, 64),
+            "本电子邮件为系统自动发送，请勿直接回复。如有问题，请回复邮箱至", _skin.GetStyle("Talk"));
 
         GUI.color = Color.white;
     }
