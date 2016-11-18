@@ -31,30 +31,5 @@ public class Utils
         GL.Vertex(p2);
     }
 
-    public static void Node(ref Rect controlRect, GUIStyle style)
-    {
-        int controlID = GUIUtility.GetControlID(FocusType.Passive);
-        switch (Event.current.GetTypeForControl(controlID))
-        {
-            case EventType.Repaint:
-                GUI.DrawTexture(controlRect, style.normal.background);
-                GUI.color = Color.white;
-                break;
 
-            case EventType.mouseDown:
-                if (controlRect.Contains(Event.current.mousePosition) && Event.current.button == 0)
-                {
-                    GUIUtility.hotControl = controlID;
-                    controlRect.x += 8;
-                }
-                break;
-
-            case EventType.mouseUp:
-                if (GUIUtility.hotControl == controlID)
-                {
-                    GUIUtility.hotControl = 0;
-                }
-                break;
-        }
-    }
 }
