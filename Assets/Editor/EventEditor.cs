@@ -8,7 +8,7 @@ public class EventEditor : EditorWindow
 
     private Rect _canvasRect = new Rect(0, 0, 2048, 2048);
 
-    private Rect _nodeRect = new Rect(64, 64, 320, 192);
+    private Rect _nodeRect = new Rect(64, 64, 256, 192);
 
     private int _gridSize = 64;
 
