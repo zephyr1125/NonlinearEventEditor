@@ -18,24 +18,61 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private GUISkin _skin;
 
-        [MenuItem("DajiaGame/EventEditor")]
+        private Config _config;
+
+        private NonlinearEventGroup _eventGroup;
+
+        /// <summary>
+        /// 选择的类型(基于鼠标点击)
+        /// </summary>
+        private SelectType _selectType;
+
+        private enum SelectType
+        {
+            None,   //什么都没选
+            Event   //选中事件节点
+        }
+
+        [MenuItem("DajiaGame/非线性事件编辑器")]
         static void OnInit()
         {
-            GetWindow<EventEditor>();
+            GetWindow<EventEditor>("非线性事件编辑器");
         }
 
         void Awake()
         {
-            _skin = AssetDatabase.LoadAssetAtPath<GUISkin>("Assets/Editor/NonlinearEventEditor.guiskin");
+            _skin = AssetDatabase.LoadAssetAtPath<GUISkin>("Assets/Dajiagame/NonlinearEvent/Editor/UI/NonlinearEventEditor.guiskin");
         }
 
         void OnGUI()
         {
             Background();
             GUI.skin = _skin;
+            ShowRightMouseMenu();
             Node(ref _nodeRect);
             GUI.skin = null;
             Repaint();
+        }
+
+        private void ShowRightMouseMenu()
+        {
+            Event currentEvent = Event.current;
+            switch (currentEvent.type)
+            {
+                case EventType.MouseUp:
+                    if (currentEvent.button == 1)
+                    {
+                        switch (_selectType) {
+                            case SelectType.None:
+                                ShowSystemMenu();
+                                break;
+                            case SelectType.Event:
+                                ShowNodeMenu();
+                                break;
+                        }
+                    }
+                    break;
+            }
         }
 
         #region background
@@ -71,6 +108,11 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void Node(ref Rect controlRect)
         {
+            if (_config == null || _eventGroup == null)
+            {
+                return;
+            }
+
             Rect drawRect = new Rect(controlRect.position + _offset, controlRect.size);
             int controlID = GUIUtility.GetControlID(FocusType.Passive);
             switch (Event.current.GetTypeForControl(controlID)) {
@@ -90,10 +132,6 @@ namespace Dajiagame.NonlinearEvent.Editor
                         GUIUtility.hotControl = 0;
                         controlRect = new Rect((int)(controlRect.x + _gridSize / 2) / _gridSize * _gridSize,
                             (int)(controlRect.y + _gridSize / 2) / _gridSize * _gridSize, controlRect.width, controlRect.height);
-                    }
-                    if (drawRect.Contains(Event.current.mousePosition) && Event.current.button == 1) {
-                        //右键抬起
-                        ShowNodeMenu();
                     }
                     break;
                 case EventType.MouseDrag:
@@ -129,6 +167,17 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         #endregion
 
+        private void ShowSystemMenu()
+        {
+            GenericMenu menu = new GenericMenu();
+            menu.AddItem(new GUIContent("新建"), false, delegate {
+
+            });
+            menu.AddItem(new GUIContent("读取"), false, delegate {
+
+            });
+            menu.ShowAsContext();
+        }
     }
 
 }
