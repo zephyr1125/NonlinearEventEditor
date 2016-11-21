@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.IO;
+using UnityEditor;
 using UnityEngine;
 
 namespace Dajiagame.NonlinearEvent.Editor
@@ -19,6 +20,8 @@ namespace Dajiagame.NonlinearEvent.Editor
         private GUISkin _skin;
 
         private Config _config;
+
+        private string _configFilePath;
 
         private NonlinearEventGroup _eventGroup;
 
@@ -108,10 +111,10 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void Node(ref Rect controlRect)
         {
-            if (_config == null || _eventGroup == null)
-            {
-                return;
-            }
+            //if (_config == null || _eventGroup == null)
+            //{
+            //    return;
+            //}
 
             Rect drawRect = new Rect(controlRect.position + _offset, controlRect.size);
             int controlID = GUIUtility.GetControlID(FocusType.Passive);
@@ -170,13 +173,39 @@ namespace Dajiagame.NonlinearEvent.Editor
         private void ShowSystemMenu()
         {
             GenericMenu menu = new GenericMenu();
-            menu.AddItem(new GUIContent("新建"), false, delegate {
 
-            });
-            menu.AddItem(new GUIContent("读取"), false, delegate {
+            menu.AddItem(new GUIContent("新建配置"), false, CreateNewConfigFile);
+            menu.AddItem(new GUIContent("读取配置"), false, LoadConfigFile);
 
-            });
+            if (_config != null)
+            {
+                menu.AddSeparator("");
+                menu.AddItem(new GUIContent("新建事件组"), false, delegate {
+
+                });
+                menu.AddItem(new GUIContent("读取事件组"), false, delegate {
+
+                });
+            }
+
             menu.ShowAsContext();
+        }
+
+        private void CreateNewConfigFile()
+        {
+            string path = EditorUtility.SaveFilePanel(
+                    "选择保存位置", "Assets", "config.asset", "asset");
+            _config = CreateInstance<Config>();
+            _configFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
+            AssetDatabase.CreateAsset(_config, _configFilePath);
+            AssetDatabase.SaveAssets();
+        }
+
+        private void LoadConfigFile()
+        {
+            string path = EditorUtility.OpenFilePanel("选择配置文件", "Assets", "asset");
+            _configFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
+            _config = AssetDatabase.LoadAssetAtPath<Config>(_configFilePath);
         }
     }
 

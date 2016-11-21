@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Dajiagame.NonlinearEvent.Editor
 {
@@ -31,6 +32,16 @@ namespace Dajiagame.NonlinearEvent.Editor
             GL.Vertex(p2);
         }
 
-
+        /// <summary>
+        /// 从绝对路径转换为AssetDataBase可用的相对路径
+        /// WARNING: 目前要求必须文件存于Assets文件夹内
+        /// </summary>
+        /// <param name="absolutePath"></param>
+        /// <returns></returns>
+        public static string AbsolutePathToAssetDataBasePath(string absolutePath)
+        {
+            Assert.IsTrue(absolutePath.Contains(Application.dataPath),"文件不能放在Assets之外:"+ absolutePath+", "+Application.dataPath);
+            return "Assets"+absolutePath.Substring(Application.dataPath.Length);
+        }
     }
 }
