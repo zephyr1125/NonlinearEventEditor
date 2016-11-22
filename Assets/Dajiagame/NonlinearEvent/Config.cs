@@ -38,7 +38,7 @@ namespace Dajiagame.NonlinearEvent
         [Serializable]
         public class Selection
         {
-            public string NameInMenu;
+            public string Name;
             public Color Color;
         }
     }

@@ -29,4 +29,8 @@ MonoBehaviour:
     Icon: {fileID: 2800000, guid: e4f8b7a72377db24f9c510e41e792e0b, type: 3}
   - Name: "\u4E19"
     Icon: {fileID: 2800000, guid: 92b8e4f90fe75224db6a36684bd079ef, type: 3}
-  Selections: []
+  Selections:
+  - Name: "\u5411\u5DE6"
+    Color: {r: 1, g: 0.50735295, b: 0.50735295, a: 1}
+  - Name: "\u5411\u53F3"
+    Color: {r: 0.5294118, g: 1, b: 0.53265715, a: 1}

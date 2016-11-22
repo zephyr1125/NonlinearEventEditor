@@ -18,16 +18,25 @@ namespace Dajiagame.NonlinearEvent.Editor
         {
             EditorGUILayout.BeginVertical();
             {
+                EditorGUILayout.Separator();
                 EditorGUILayout.LabelField("事件会产生的数据效果");
                 EditorGUILayout.BeginHorizontal();
                 {
                     DrawEffects();
                 }
                 EditorGUILayout.EndHorizontal();
+                EditorGUILayout.Separator();
                 EditorGUILayout.LabelField("参与的角色");
                 EditorGUILayout.BeginHorizontal();
                 {
                     DrawCharacters();
+                }
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.Separator();
+                EditorGUILayout.LabelField("选项分支的名称与颜色");
+                EditorGUILayout.BeginHorizontal();
+                {
+                    DrawSelections();
                 }
                 EditorGUILayout.EndHorizontal();
             }
@@ -73,6 +82,26 @@ namespace Dajiagame.NonlinearEvent.Editor
             }
             if (GUILayout.Button("+", GUILayout.Width(32), GUILayout.Height(107))) {
                 _config.Characters.Add(new Config.Character());
+            }
+            EditorUtility.SetDirty(_config);
+        }
+
+        private void DrawSelections()
+        {
+            for (int i = 0; i < _config.Selections.Count; i++) {
+                using (new EditorGUILayout.VerticalScope("box")) {
+                    //名称
+                    _config.Selections[i].Name = EditorGUILayout.TextField(_config.Selections[i].Name, GUILayout.Width(64));
+                    //颜色
+                    _config.Selections[i].Color = EditorGUILayout.ColorField(_config.Selections[i].Color, GUILayout.Width(64), GUILayout.Height(16));
+                    //移除按钮
+                    if (GUILayout.Button("-", GUILayout.Width(64), GUILayout.Height(16))) {
+                        _config.Selections.RemoveAt(i);
+                    }
+                }
+            }
+            if (GUILayout.Button("+", GUILayout.Width(32), GUILayout.Height(60))) {
+                _config.Selections.Add(new Config.Selection());
             }
             EditorUtility.SetDirty(_config);
         }
