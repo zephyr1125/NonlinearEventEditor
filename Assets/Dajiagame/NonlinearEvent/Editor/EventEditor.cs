@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,6 +7,7 @@ namespace Dajiagame.NonlinearEvent.Editor
 {
     public class EventEditor : EditorWindow
     {
+        public static EventEditor Instance;
 
         private float _sliderValue = 1;
 
@@ -19,7 +21,7 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private GUISkin _skin;
 
-        private Config _config;
+        public Config Config;
 
         private string _configFilePath;
 
@@ -39,11 +41,12 @@ namespace Dajiagame.NonlinearEvent.Editor
         [MenuItem("DajiaGame/非线性事件编辑器")]
         static void OnInit()
         {
-            GetWindow<EventEditor>("非线性事件编辑器");
+             GetWindow<EventEditor>("非线性事件编辑器");
         }
 
-        void Awake()
+        void OnEnable()
         {
+            Instance = this;
             _skin = AssetDatabase.LoadAssetAtPath<GUISkin>("Assets/Dajiagame/NonlinearEvent/Editor/UI/NonlinearEventEditor.guiskin");
         }
 
@@ -111,7 +114,7 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void Node(ref Rect controlRect)
         {
-            //if (_config == null || _eventGroup == null)
+            //if (Config == null || _eventGroup == null)
             //{
             //    return;
             //}
@@ -177,8 +180,9 @@ namespace Dajiagame.NonlinearEvent.Editor
             menu.AddItem(new GUIContent("新建配置"), false, CreateNewConfigFile);
             menu.AddItem(new GUIContent("读取配置"), false, LoadConfigFile);
 
-            if (_config != null)
+            if (Config != null)
             {
+                menu.AddItem(new GUIContent("编辑配置"), false, EditConfigFile);
                 menu.AddSeparator("");
                 menu.AddItem(new GUIContent("新建事件组"), false, delegate {
 
@@ -195,17 +199,31 @@ namespace Dajiagame.NonlinearEvent.Editor
         {
             string path = EditorUtility.SaveFilePanel(
                     "选择保存位置", "Assets", "config.asset", "asset");
-            _config = CreateInstance<Config>();
+            if (String.IsNullOrEmpty(path))
+            {
+                return;
+            }
+            Config = CreateInstance<Config>();
             _configFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
-            AssetDatabase.CreateAsset(_config, _configFilePath);
+            AssetDatabase.CreateAsset(Config, _configFilePath);
             AssetDatabase.SaveAssets();
+            EditConfigFile();
         }
 
         private void LoadConfigFile()
         {
             string path = EditorUtility.OpenFilePanel("选择配置文件", "Assets", "asset");
+            if (String.IsNullOrEmpty(path)) {
+                return;
+            }
             _configFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
-            _config = AssetDatabase.LoadAssetAtPath<Config>(_configFilePath);
+            Config = AssetDatabase.LoadAssetAtPath<Config>(_configFilePath);
+            EditConfigFile();
+        }
+
+        private void EditConfigFile()
+        {
+            GetWindow<ConfigEditor>("编辑配置");
         }
     }
 

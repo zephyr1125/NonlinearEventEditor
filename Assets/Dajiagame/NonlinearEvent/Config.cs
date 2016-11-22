@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Dajiagame.NonlinearEvent
 {
@@ -7,24 +9,33 @@ namespace Dajiagame.NonlinearEvent
         /// <summary>
         /// 事件影响效果设置：数量、图标
         /// </summary>
-        public Texture2D[] EventIcons;
+        public List<Effect> Effects = new List<Effect>();
 
         /// <summary>
         /// 人物设置：数量、名称、图标
         /// </summary>
-        public Char[] Characters;
+        public List<Character> Characters;
 
         /// <summary>
         /// 选项分支设置：数量、颜色、名称
         /// </summary>
-        public Selection[] Selections;
+        public List<Selection> Selections;
 
-        public class Char
+        [Serializable]
+        public class Effect
         {
             public string Name;
             public Texture2D Icon;
         }
 
+        [Serializable]
+        public class Character
+        {
+            public string Name;
+            public Texture2D Icon;
+        }
+
+        [Serializable]
         public class Selection
         {
             public string NameInMenu;

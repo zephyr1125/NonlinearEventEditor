@@ -11,4 +11,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fed2dc0766f81b34b975dc903f9990c8, type: 3}
   m_Name: config
   m_EditorClassIdentifier: 
-  EventIcons: []
+  Effects:
+  - Name: "\u653B\u51FB\u529B"
+    Icon: {fileID: 2800000, guid: abf37bf659663c9419dd3915b102fc83, type: 3}
+  - Name: "\u9632\u5FA1\u529B"
+    Icon: {fileID: 2800000, guid: 3ad304273bd51ee4c901c8af013b7a01, type: 3}
+  - Name: "\u4F53\u529B"
+    Icon: {fileID: 2800000, guid: b5f3b9f990f490349b4ba643c6f38307, type: 3}
+  - Name: "\u667A\u529B"
+    Icon: {fileID: 2800000, guid: e881292be367a0b47ae2901b7e13e0b2, type: 3}
+  - Name: "\u654F\u6377"
+    Icon: {fileID: 2800000, guid: 92366fc39aaf0bd488d6575f05363988, type: 3}
+  Characters:
+  - Name: "\u7532"
+    Icon: {fileID: 2800000, guid: 83de905e072635c49bb62d63f9059800, type: 3}
+  - Name: "\u4E59"
+    Icon: {fileID: 2800000, guid: e4f8b7a72377db24f9c510e41e792e0b, type: 3}
+  - Name: "\u4E19"
+    Icon: {fileID: 2800000, guid: 92b8e4f90fe75224db6a36684bd079ef, type: 3}
+  Selections: []
