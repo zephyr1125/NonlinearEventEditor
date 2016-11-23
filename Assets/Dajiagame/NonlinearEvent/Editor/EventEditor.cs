@@ -27,6 +27,8 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private NonlinearEventGroup _eventGroup;
 
+        private string _eventGroupFilePath;
+
         /// <summary>
         /// 选择的类型(基于鼠标点击)
         /// </summary>
@@ -184,22 +186,20 @@ namespace Dajiagame.NonlinearEvent.Editor
             {
                 menu.AddItem(new GUIContent("编辑配置"), false, EditConfigFile);
                 menu.AddSeparator("");
-                menu.AddItem(new GUIContent("新建事件组"), false, delegate {
-
-                });
-                menu.AddItem(new GUIContent("读取事件组"), false, delegate {
-
-                });
+                menu.AddItem(new GUIContent("新建事件组"), false, CreateNewEventGroupFile);
+                menu.AddItem(new GUIContent("读取事件组"), false, LoadEventGroupFile);
             }
 
             menu.ShowAsContext();
         }
 
+#region ConfigFile
+
         private void CreateNewConfigFile()
         {
             string path = EditorUtility.SaveFilePanel(
                     "选择保存位置", "Assets", "config.asset", "asset");
-            if (String.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty(path))
             {
                 return;
             }
@@ -213,7 +213,7 @@ namespace Dajiagame.NonlinearEvent.Editor
         private void LoadConfigFile()
         {
             string path = EditorUtility.OpenFilePanel("选择配置文件", "Assets", "asset");
-            if (String.IsNullOrEmpty(path)) {
+            if (string.IsNullOrEmpty(path)) {
                 return;
             }
             _configFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
@@ -225,6 +225,35 @@ namespace Dajiagame.NonlinearEvent.Editor
         {
             GetWindow<ConfigEditor>("编辑配置");
         }
-    }
 
+#endregion
+
+#region EventGroupFile
+
+        private void CreateNewEventGroupFile()
+        {
+            string path = EditorUtility.SaveFilePanel(
+                    "选择保存位置", "Assets", "event_group.asset", "asset");
+            if (string.IsNullOrEmpty(path)) {
+                return;
+            }
+            _eventGroup = CreateInstance<NonlinearEventGroup>();
+            _eventGroupFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
+            AssetDatabase.CreateAsset(_eventGroup, _eventGroupFilePath);
+            AssetDatabase.SaveAssets();
+        }
+
+        private void LoadEventGroupFile()
+        {
+            string path = EditorUtility.OpenFilePanel("选择配置文件", "Assets", "asset");
+            if (string.IsNullOrEmpty(path)) {
+                return;
+            }
+            _eventGroupFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
+            _eventGroup = AssetDatabase.LoadAssetAtPath<NonlinearEventGroup>(_eventGroupFilePath);
+        }
+
+#endregion
+
+    }
 }

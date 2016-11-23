@@ -4,9 +4,7 @@ namespace Dajiagame.NonlinearEvent
 {
     public class NonlinearEventGroup : ScriptableObject
     {
-        void OnEnable()
-        {
 
-        }
+        public List<EventNode> ListNodes;
     }
 }
