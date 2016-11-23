@@ -29,15 +29,17 @@ MonoBehaviour:
       Color: {r: 1, g: 0.42647058, b: 0.42647058, a: 1}
     - Name: "\u5411\u53F3"
       Color: {r: 0, g: 1, b: 0.17241383, a: 1}
+    - Name: "\u5411\u4E0B"
+      Color: {r: 0, g: 0, b: 0, a: 0}
   ListNodes:
   - ID: 0
     PrevID: 0
     ConfirmNextID: 0
     RejectNextID: 0
-    Text: "\u6587\u672C"
+    Text: "\u6D4B\u8BD5\u8F93\u5165\u4E3B\u6587\u672C"
     PreviewText: "\u9884\u89C8\u6587\u672C"
     Effects: 
-    Position: {x: 640, y: 128}
+    Position: {x: 704, y: 192}
   - ID: 1
     PrevID: 0
     ConfirmNextID: 0
@@ -45,7 +47,7 @@ MonoBehaviour:
     Text: "\u6587\u672C"
     PreviewText: "\u9884\u89C8\u6587\u672C"
     Effects: 
-    Position: {x: 768, y: 384}
+    Position: {x: 320, y: 576}
   - ID: 2
     PrevID: 0
     ConfirmNextID: 0
@@ -54,3 +56,27 @@ MonoBehaviour:
     PreviewText: "\u9884\u89C8\u6587\u672C"
     Effects: 
     Position: {x: 448, y: 384}
+  - ID: 0
+    PrevID: 0
+    ConfirmNextID: 0
+    RejectNextID: 0
+    Text: "\u6587\u672C"
+    PreviewText: "\u9884\u89C8\u6587\u672C"
+    Effects: 
+    Position: {x: 960, y: 384}
+  - ID: 0
+    PrevID: 0
+    ConfirmNextID: 0
+    RejectNextID: 0
+    Text: "\u6587\u672C"
+    PreviewText: "\u9884\u89C8\u6587\u672C"
+    Effects: 
+    Position: {x: 576, y: 576}
+  - ID: 0
+    PrevID: 0
+    ConfirmNextID: 0
+    RejectNextID: 0
+    Text: "\u6587\u672C"
+    PreviewText: "\u9884\u89C8\u6587\u672C"
+    Effects: 
+    Position: {x: 960, y: 576}

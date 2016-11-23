@@ -20,6 +20,8 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private Vector2 _rootNodePositon = new Vector2(256, 128);
 
+        private int _widthRight = 256;
+
         private Vector2 _offset = Vector2.zero;
 
         private GUISkin _skin;
@@ -48,6 +50,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             GUI.skin = _skin;
             ShowRightMouseMenu();
             DrawEventNodes();
+            DrawRightPanel();
             GUI.skin = null;
             Repaint();
         }
@@ -84,6 +87,26 @@ namespace Dajiagame.NonlinearEvent.Editor
                     }
                     break;
             }
+        }
+
+        private void DrawRightPanel()
+        {
+            if (_selectedNode == null)
+            {
+                return;
+            }
+            Rect rightRect = new Rect(Screen.width - _widthRight, 0, _widthRight, Screen.height);
+            GUILayout.BeginArea(rightRect, _skin.GetStyle("Right"));
+            EditorGUILayout.BeginVertical();
+            {
+                GUILayout.Label("设置节点数据",_skin.GetStyle("Title"));
+                GUILayout.Label("简介文本");
+                _selectedNode.PreviewText = GUILayout.TextField(_selectedNode.PreviewText);
+                GUILayout.Label("主文本");
+                _selectedNode.Text = GUILayout.TextArea(_selectedNode.Text,GUILayout.Height(128));
+            }
+            EditorGUILayout.EndVertical();
+            GUILayout.EndArea();
         }
 
         #region background
@@ -182,7 +205,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             GUI.Label(drawRect, "", _skin.GetStyle("Node"));
             GUI.Label(new Rect(drawRect.x, drawRect.y, drawRect.width, 24), "这里是标题", _skin.GetStyle("Title"));
             GUI.TextArea(new Rect(drawRect.x, drawRect.y + 23, drawRect.width, 64),
-                "本电子邮件为系统自动发送，请勿直接回复。如有问题，请回复邮箱至", _skin.GetStyle("Talk"));
+                node.Text, _skin.GetStyle("Talk"));
 
             GUI.color = Color.white;
         }
@@ -190,12 +213,12 @@ namespace Dajiagame.NonlinearEvent.Editor
         private void ShowNodeMenu()
         {
             GenericMenu menu = new GenericMenu();
-            menu.AddItem(new GUIContent("←连接"), false, delegate {
+            foreach (var selection in EventGroup.Config.Selections)
+            {
+                menu.AddItem(new GUIContent(selection.Name), false, delegate {
 
-            });
-            menu.AddItem(new GUIContent("→连接"), false, delegate {
-
-            });
+                });
+            }
             menu.ShowAsContext();
         }
 
