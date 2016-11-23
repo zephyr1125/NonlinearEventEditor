@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Dajiagame.NonlinearEvent
 {
@@ -26,6 +27,11 @@ namespace Dajiagame.NonlinearEvent
         public string PreviewText = "预览文本";
 
         public int[] Effects;
+
+        /// <summary>
+        /// 编辑器使用的，绘制节点的位置
+        /// </summary>
+        public Vector2 Position;
 
     }
 }

@@ -10,7 +10,7 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         void Awake()
         {
-            _config = EventEditor.Instance.Config;
+            _config = EventEditor.Instance.EventGroup.Config;
             position = new Rect(160, 160, 360, 640);
         }
 
@@ -63,7 +63,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             {
                 _config.Effects.Add(new Config.Effect());
             }
-            EditorUtility.SetDirty(_config);
+            EditorUtility.SetDirty(EventEditor.Instance.EventGroup);
         }
 
         private void DrawCharacters()
@@ -83,7 +83,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             if (GUILayout.Button("+", GUILayout.Width(32), GUILayout.Height(107))) {
                 _config.Characters.Add(new Config.Character());
             }
-            EditorUtility.SetDirty(_config);
+            EditorUtility.SetDirty(EventEditor.Instance.EventGroup);
         }
 
         private void DrawSelections()
@@ -103,7 +103,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             if (GUILayout.Button("+", GUILayout.Width(32), GUILayout.Height(60))) {
                 _config.Selections.Add(new Config.Selection());
             }
-            EditorUtility.SetDirty(_config);
+            EditorUtility.SetDirty(EventEditor.Instance.EventGroup);
         }
     }
 }

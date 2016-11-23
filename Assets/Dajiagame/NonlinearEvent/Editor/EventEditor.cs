@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -11,34 +12,23 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private float _sliderValue = 1;
 
-        private Rect _canvasRect = new Rect(0, 0, 2048, 2048);
-
-        private Rect _nodeRect = new Rect(64, 64, 256, 192);
+        private Rect _canvasRect = new Rect(0, 0, 20480, 20480);
 
         private int _gridSize = 64;
+
+        private Vector2 _nodeSize = new Vector2(256, 192);
+
+        private Vector2 _rootNodePositon = new Vector2(256, 128);
 
         private Vector2 _offset = Vector2.zero;
 
         private GUISkin _skin;
 
-        public Config Config;
-
-        private string _configFilePath;
-
-        private NonlinearEventGroup _eventGroup;
+        public NonlinearEventGroup EventGroup;
 
         private string _eventGroupFilePath;
 
-        /// <summary>
-        /// 选择的类型(基于鼠标点击)
-        /// </summary>
-        private SelectType _selectType;
-
-        private enum SelectType
-        {
-            None,   //什么都没选
-            Event   //选中事件节点
-        }
+        private EventNode _selectedNode;
 
         [MenuItem("DajiaGame/非线性事件编辑器")]
         static void OnInit()
@@ -57,9 +47,22 @@ namespace Dajiagame.NonlinearEvent.Editor
             Background();
             GUI.skin = _skin;
             ShowRightMouseMenu();
-            Node(ref _nodeRect);
+            DrawEventNodes();
             GUI.skin = null;
             Repaint();
+        }
+
+        private void DrawEventNodes()
+        {
+            if (EventGroup == null)
+            {
+                return;
+            }
+
+            foreach (var eventNode in EventGroup.ListNodes)
+            {
+                Node(eventNode);
+            }
         }
 
         private void ShowRightMouseMenu()
@@ -70,13 +73,13 @@ namespace Dajiagame.NonlinearEvent.Editor
                 case EventType.MouseUp:
                     if (currentEvent.button == 1)
                     {
-                        switch (_selectType) {
-                            case SelectType.None:
-                                ShowSystemMenu();
-                                break;
-                            case SelectType.Event:
-                                ShowNodeMenu();
-                                break;
+                        if (_selectedNode != null && PointInNodeDrawRect(_selectedNode, Event.current.mousePosition))
+                        {
+                            ShowNodeMenu();
+                        }
+                        else
+                        {
+                            ShowSystemMenu(currentEvent);
                         }
                     }
                     break;
@@ -114,45 +117,68 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         #region node
 
-        private void Node(ref Rect controlRect)
+        private Rect GetNodeDrawRect(EventNode node)
         {
-            //if (Config == null || _eventGroup == null)
-            //{
-            //    return;
-            //}
+            Rect controlRect = new Rect(node.Position, _nodeSize);
+            return new Rect(controlRect.position + _offset, controlRect.size);
+        }
 
-            Rect drawRect = new Rect(controlRect.position + _offset, controlRect.size);
+        private bool PointInNodeDrawRect(EventNode node, Vector2 point)
+        {
+            return GetNodeDrawRect(node).Contains(point);
+        }
+
+        private void Node(EventNode node)
+        {
+            Rect controlRect = new Rect(node.Position, _nodeSize);
+            Rect drawRect = GetNodeDrawRect(node);
+
             int controlID = GUIUtility.GetControlID(FocusType.Passive);
             switch (Event.current.GetTypeForControl(controlID)) {
                 case EventType.Repaint:
-                    DrawNode(drawRect);
+                    DrawNode(node, drawRect);
                     break;
 
                 case EventType.MouseDown:
-                    if (drawRect.Contains(Event.current.mousePosition) && Event.current.button == 0) {
+                    if (PointInNodeDrawRect(node, Event.current.mousePosition) && Event.current.button == 0) {
+                        Debug.Log("Down At "+ node.ID);
                         GUIUtility.hotControl = controlID;
                     }
                     break;
-
                 case EventType.MouseUp:
-                    if (GUIUtility.hotControl == controlID && Event.current.button == 0) {
-                        //左键抬起
-                        GUIUtility.hotControl = 0;
-                        controlRect = new Rect((int)(controlRect.x + _gridSize / 2) / _gridSize * _gridSize,
-                            (int)(controlRect.y + _gridSize / 2) / _gridSize * _gridSize, controlRect.width, controlRect.height);
+                    if (PointInNodeDrawRect(node, Event.current.mousePosition))
+                    {
+                        if (Event.current.button == 0) {
+                            Debug.Log("Up At " + node.ID);
+                            if (GUIUtility.hotControl == controlID)
+                            {
+                                //左键抬起
+                                //拖拽完成
+                                GUIUtility.hotControl = 0;
+                                node.Position = new Vector2((int) (controlRect.x + _gridSize/2)/_gridSize*_gridSize,
+                                    (int) (controlRect.y + _gridSize/2)/_gridSize*_gridSize);
+                                EditorUtility.SetDirty(EventGroup);
+                                //选中Node
+                                _selectedNode = node;
+                            }
+                        }
                     }
                     break;
                 case EventType.MouseDrag:
                     if (GUIUtility.hotControl == controlID) {
-                        controlRect.center += Event.current.delta;
+                        node.Position += Event.current.delta;
                     }
                     break;
             }
         }
 
-        private void DrawNode(Rect controlRect)
+        private void DrawNode(EventNode node, Rect controlRect)
         {
-            Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);
+            if (node == _selectedNode) {
+                GUI.color = Color.cyan;
+            }
+
+            Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);           
             GUI.Label(drawRect, "", _skin.GetStyle("Node"));
             GUI.Label(new Rect(drawRect.x, drawRect.y, drawRect.width, 24), "这里是标题", _skin.GetStyle("Title"));
             GUI.TextArea(new Rect(drawRect.x, drawRect.y + 23, drawRect.width, 64),
@@ -173,53 +199,46 @@ namespace Dajiagame.NonlinearEvent.Editor
             menu.ShowAsContext();
         }
 
+        private void CreateNewNode(Vector2 createAt)
+        {
+            if (EventGroup.ListNodes == null)
+            {
+                EventGroup.ListNodes = new List<EventNode>();
+            }
+            EventNode newNode = new EventNode
+            {
+                Position = createAt
+            };
+            EventGroup.ListNodes.Add(newNode);
+        }
+
         #endregion
 
-        private void ShowSystemMenu()
+        private void ShowSystemMenu(Event currentEvent)
         {
             GenericMenu menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("新建配置"), false, CreateNewConfigFile);
-            menu.AddItem(new GUIContent("读取配置"), false, LoadConfigFile);
-
-            if (Config != null)
-            {
-                menu.AddItem(new GUIContent("编辑配置"), false, EditConfigFile);
+            if (EventGroup != null) {
+                menu.AddItem(new GUIContent("新建节点"), false, delegate
+                {
+                    CreateNewNode(currentEvent.mousePosition);
+                });
+                menu.AddItem(new GUIContent("调整设置"), false, EditConfigFile);
                 menu.AddSeparator("");
-                menu.AddItem(new GUIContent("新建事件组"), false, CreateNewEventGroupFile);
-                menu.AddItem(new GUIContent("读取事件组"), false, LoadEventGroupFile);
+            }
+
+            menu.AddItem(new GUIContent("新建文件"), false, CreateNewFile);
+            menu.AddItem(new GUIContent("读取文件"), false, LoadFile);
+
+            if (EventGroup != null) {
+                menu.AddItem(new GUIContent("保存文件"), false, delegate { });
+                menu.AddItem(new GUIContent("另存为…"), false, delegate { });
             }
 
             menu.ShowAsContext();
         }
 
 #region ConfigFile
-
-        private void CreateNewConfigFile()
-        {
-            string path = EditorUtility.SaveFilePanel(
-                    "选择保存位置", "Assets", "config.asset", "asset");
-            if (string.IsNullOrEmpty(path))
-            {
-                return;
-            }
-            Config = CreateInstance<Config>();
-            _configFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
-            AssetDatabase.CreateAsset(Config, _configFilePath);
-            AssetDatabase.SaveAssets();
-            EditConfigFile();
-        }
-
-        private void LoadConfigFile()
-        {
-            string path = EditorUtility.OpenFilePanel("选择配置文件", "Assets", "asset");
-            if (string.IsNullOrEmpty(path)) {
-                return;
-            }
-            _configFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
-            Config = AssetDatabase.LoadAssetAtPath<Config>(_configFilePath);
-            EditConfigFile();
-        }
 
         private void EditConfigFile()
         {
@@ -230,27 +249,28 @@ namespace Dajiagame.NonlinearEvent.Editor
 
 #region EventGroupFile
 
-        private void CreateNewEventGroupFile()
+        private void CreateNewFile()
         {
             string path = EditorUtility.SaveFilePanel(
                     "选择保存位置", "Assets", "event_group.asset", "asset");
             if (string.IsNullOrEmpty(path)) {
                 return;
             }
-            _eventGroup = CreateInstance<NonlinearEventGroup>();
+            EventGroup = CreateInstance<NonlinearEventGroup>();
             _eventGroupFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
-            AssetDatabase.CreateAsset(_eventGroup, _eventGroupFilePath);
+            AssetDatabase.CreateAsset(EventGroup, _eventGroupFilePath);
             AssetDatabase.SaveAssets();
+            EditConfigFile();
         }
 
-        private void LoadEventGroupFile()
+        private void LoadFile()
         {
-            string path = EditorUtility.OpenFilePanel("选择配置文件", "Assets", "asset");
+            string path = EditorUtility.OpenFilePanel("选择文件", "Assets", "asset");
             if (string.IsNullOrEmpty(path)) {
                 return;
             }
             _eventGroupFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
-            _eventGroup = AssetDatabase.LoadAssetAtPath<NonlinearEventGroup>(_eventGroupFilePath);
+            EventGroup = AssetDatabase.LoadAssetAtPath<NonlinearEventGroup>(_eventGroupFilePath);
         }
 
 #endregion

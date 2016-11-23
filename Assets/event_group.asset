@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1811ca0bc731f844e8edd843eacffb62, type: 3}
+  m_Name: event_group
+  m_EditorClassIdentifier: 
+  Config:
+    Effects:
+    - Name: "\u653B"
+      Icon: {fileID: 2800000, guid: abf37bf659663c9419dd3915b102fc83, type: 3}
+    - Name: "\u9632"
+      Icon: {fileID: 2800000, guid: 3ad304273bd51ee4c901c8af013b7a01, type: 3}
+    - Name: "\u8840"
+      Icon: {fileID: 2800000, guid: b5f3b9f990f490349b4ba643c6f38307, type: 3}
+    Characters:
+    - Name: "\u8D75\u4E91"
+      Icon: {fileID: 2800000, guid: 92b8e4f90fe75224db6a36684bd079ef, type: 3}
+    - Name: "\u8463\u5353"
+      Icon: {fileID: 2800000, guid: e4f8b7a72377db24f9c510e41e792e0b, type: 3}
+    Selections:
+    - Name: "\u5411\u5DE6"
+      Color: {r: 1, g: 0.42647058, b: 0.42647058, a: 1}
+    - Name: "\u5411\u53F3"
+      Color: {r: 0, g: 1, b: 0.17241383, a: 1}
+  ListNodes:
+  - ID: 0
+    PrevID: 0
+    ConfirmNextID: 0
+    RejectNextID: 0
+    Text: "\u6587\u672C"
+    PreviewText: "\u9884\u89C8\u6587\u672C"
+    Effects: 
+    Position: {x: 640, y: 128}
+  - ID: 1
+    PrevID: 0
+    ConfirmNextID: 0
+    RejectNextID: 0
+    Text: "\u6587\u672C"
+    PreviewText: "\u9884\u89C8\u6587\u672C"
+    Effects: 
+    Position: {x: 768, y: 384}
+  - ID: 2
+    PrevID: 0
+    ConfirmNextID: 0
+    RejectNextID: 0
+    Text: "\u6587\u672C"
+    PreviewText: "\u9884\u89C8\u6587\u672C"
+    Effects: 
+    Position: {x: 448, y: 384}

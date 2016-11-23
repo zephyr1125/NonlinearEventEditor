@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace Dajiagame.NonlinearEvent
 {
-    public class Config : ScriptableObject
+    [Serializable]
+    public class Config
     {
         /// <summary>
         /// 事件影响效果设置：数量、图标
@@ -14,12 +15,12 @@ namespace Dajiagame.NonlinearEvent
         /// <summary>
         /// 人物设置：数量、名称、图标
         /// </summary>
-        public List<Character> Characters;
+        public List<Character> Characters = new List<Character>();
 
         /// <summary>
         /// 选项分支设置：数量、颜色、名称
         /// </summary>
-        public List<Selection> Selections;
+        public List<Selection> Selections = new List<Selection>();
 
         [Serializable]
         public class Effect
