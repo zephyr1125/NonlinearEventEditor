@@ -32,6 +32,8 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private EventNode _selectedNode;
 
+        private int _lastEventID;
+
         [MenuItem("DajiaGame/非线性事件编辑器")]
         static void OnInit()
         {
@@ -61,7 +63,9 @@ namespace Dajiagame.NonlinearEvent.Editor
             {
                 return;
             }
-
+            if (EventGroup.ListNodes == null) {
+                return;
+            }
             foreach (var eventNode in EventGroup.ListNodes)
             {
                 Node(eventNode);
@@ -164,7 +168,6 @@ namespace Dajiagame.NonlinearEvent.Editor
 
                 case EventType.MouseDown:
                     if (PointInNodeDrawRect(node, Event.current.mousePosition) && Event.current.button == 0) {
-                        Debug.Log("Down At "+ node.ID);
                         GUIUtility.hotControl = controlID;
                     }
                     break;
@@ -172,7 +175,6 @@ namespace Dajiagame.NonlinearEvent.Editor
                     if (PointInNodeDrawRect(node, Event.current.mousePosition))
                     {
                         if (Event.current.button == 0) {
-                            Debug.Log("Up At " + node.ID);
                             if (GUIUtility.hotControl == controlID)
                             {
                                 //左键抬起
@@ -204,7 +206,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);           
             GUI.Label(drawRect, "", _skin.GetStyle("Node"));
             GUI.Label(new Rect(drawRect.x, drawRect.y, drawRect.width, 24), "这里是标题", _skin.GetStyle("Title"));
-            GUI.TextArea(new Rect(drawRect.x, drawRect.y + 23, drawRect.width, 64),
+            GUI.Label(new Rect(drawRect.x, drawRect.y + 23, drawRect.width, 64),
                 node.Text, _skin.GetStyle("Talk"));
 
             GUI.color = Color.white;
@@ -227,12 +229,15 @@ namespace Dajiagame.NonlinearEvent.Editor
             if (EventGroup.ListNodes == null)
             {
                 EventGroup.ListNodes = new List<EventNode>();
+                _lastEventID = 0;
             }
             EventNode newNode = new EventNode
             {
+                ID =  _lastEventID,
                 Position = createAt
             };
             EventGroup.ListNodes.Add(newNode);
+            _lastEventID++;
         }
 
         #endregion
