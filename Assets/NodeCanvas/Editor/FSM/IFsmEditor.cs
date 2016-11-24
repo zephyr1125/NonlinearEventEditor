@@ -44,7 +44,7 @@ public class IFsmEditor : NodeEditor {
 			_parametersList.headerHeight = 0;
 				offset = _scriptableObject.CurrentGroup.CanvasPos;
 			UpdateNodes ();
-//			startNode = (Node) _scriptableObject.startNode;
+//			StartNode = (Node) _scriptableObject.StartNode;
 				groupPaths = _scriptableObject.currentGroupPath;
 		}
 		Repaint ();

@@ -22,30 +22,29 @@ MonoBehaviour:
       Icon: {fileID: 2800000, guid: 83de905e072635c49bb62d63f9059800, type: 3}
     - Name: "\u4E59"
       Icon: {fileID: 2800000, guid: e4f8b7a72377db24f9c510e41e792e0b, type: 3}
-    Selections:
-    - Name: "\u5DE6"
-      Color: {r: 0, g: 0, b: 0, a: 0}
-    - Name: "\u53F3"
-      Color: {r: 0, g: 0, b: 0, a: 0}
+    Transitions:
+    - Name: "\u5411\u5DE6"
+      Color: {r: 1, g: 0.5294118, b: 0.5294118, a: 1}
+    - Name: "\u5411\u53F3"
+      Color: {r: 0.44117647, g: 1, b: 0.4450304, a: 1}
+    - Name: "\u5411\u4E0B"
+      Color: {r: 0.38235274, g: 0.3602941, b: 1, a: 1}
   ListNodes:
-  - ID: 0
-    PrevEventIDs: 
-    NextEventIDs: 
+  - ID: 1
+    NextEventIDs: 000000000000000002000000
     Text: "\u6587\u672C111"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
-    Position: {x: 448, y: 128}
-  - ID: 1
-    PrevEventIDs: 
-    NextEventIDs: 
+    Position: {x: 704, y: 0}
+  - ID: 2
+    NextEventIDs: 0000000003000000
     Text: "\u6587\u672C22"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
-    Position: {x: 256, y: 320}
-  - ID: 2
-    PrevEventIDs: 
+    Position: {x: 448, y: 192}
+  - ID: 3
     NextEventIDs: 
-    Text: "\u6587\u672C33"
+    Text: "\u6587\u672C"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
-    Position: {x: 640, y: 320}
+    Position: {x: 448, y: 384}

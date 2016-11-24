@@ -10,11 +10,6 @@ namespace Dajiagame.NonlinearEvent
         public int ID;
 
         /// <summary>
-        /// 各个前置事件ID
-        /// </summary>
-        public List<int> PrevEventIDs = new List<int>();
-
-        /// <summary>
         /// 各个后续事件ID
         /// </summary>
         public List<int> NextEventIDs = new List<int>();
@@ -31,6 +26,19 @@ namespace Dajiagame.NonlinearEvent
         /// 编辑器使用的，绘制节点的位置
         /// </summary>
         public Vector2 Position;
+
+        public void AddNextEventNode(int connectionID, int nextNodeID)
+        {
+            if (NextEventIDs == null)
+            {
+                NextEventIDs = new List<int>();
+            }
+            while (NextEventIDs.Count <= connectionID)
+            {
+                NextEventIDs.Add(0);
+            }
+            NextEventIDs[connectionID] = nextNodeID;
+        }
 
     }
 }

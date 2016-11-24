@@ -97,7 +97,7 @@ public static  class NodeStyles {
 			NodeStyles.centeredLabel=new GUIStyle("Label"){
 				alignment = TextAnchor.UpperCenter,
 			};
-			NodeStyles.instructionLabel = new GUIStyle ("TL Selection H2"){
+			NodeStyles.instructionLabel = new GUIStyle ("TL Transition H2"){
 				padding = new RectOffset (3, 3, 3, 3),
 				contentOffset=NodeStyles.wrappedLabel.contentOffset,
 				alignment = TextAnchor.UpperLeft,

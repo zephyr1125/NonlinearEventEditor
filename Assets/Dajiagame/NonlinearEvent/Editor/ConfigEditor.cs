@@ -88,20 +88,20 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void DrawSelections()
         {
-            for (int i = 0; i < _config.Selections.Count; i++) {
+            for (int i = 0; i < _config.Transitions.Count; i++) {
                 using (new EditorGUILayout.VerticalScope("box")) {
                     //名称
-                    _config.Selections[i].Name = EditorGUILayout.TextField(_config.Selections[i].Name, GUILayout.Width(64));
+                    _config.Transitions[i].Name = EditorGUILayout.TextField(_config.Transitions[i].Name, GUILayout.Width(64));
                     //颜色
-                    _config.Selections[i].Color = EditorGUILayout.ColorField(_config.Selections[i].Color, GUILayout.Width(64), GUILayout.Height(16));
+                    _config.Transitions[i].Color = EditorGUILayout.ColorField(_config.Transitions[i].Color, GUILayout.Width(64), GUILayout.Height(16));
                     //移除按钮
                     if (GUILayout.Button("-", GUILayout.Width(64), GUILayout.Height(16))) {
-                        _config.Selections.RemoveAt(i);
+                        _config.Transitions.RemoveAt(i);
                     }
                 }
             }
             if (GUILayout.Button("+", GUILayout.Width(32), GUILayout.Height(60))) {
-                _config.Selections.Add(new Config.Selection());
+                _config.Transitions.Add(new Config.Transition());
             }
             EditorUtility.SetDirty(EventEditor.Instance.EventGroup);
         }

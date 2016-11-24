@@ -20,7 +20,7 @@ namespace Dajiagame.NonlinearEvent
         /// <summary>
         /// 选项分支设置：数量、颜色、名称
         /// </summary>
-        public List<Selection> Selections = new List<Selection>();
+        public List<Transition> Transitions = new List<Transition>();
 
         [Serializable]
         public class Effect
@@ -37,7 +37,7 @@ namespace Dajiagame.NonlinearEvent
         }
 
         [Serializable]
-        public class Selection
+        public class Transition
         {
             public string Name;
             public Color Color;

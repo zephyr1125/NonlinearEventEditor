@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using NodeCanvas;
 using UnityEditor;
 using UnityEngine;
 
@@ -34,6 +35,21 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private int _lastEventID;
 
+        private List<Transition> _listTransitions;
+
+        /// <summary>
+        /// 正在连线时的当前连接编号
+        /// </summary>
+        private int _currentTransitionType;
+
+        private State _state;
+
+        private enum State
+        {
+            Idle,
+            ConnectTransition
+        }
+
         [MenuItem("DajiaGame/非线性事件编辑器")]
         static void OnInit()
         {
@@ -44,6 +60,7 @@ namespace Dajiagame.NonlinearEvent.Editor
         {
             Instance = this;
             _skin = AssetDatabase.LoadAssetAtPath<GUISkin>("Assets/Dajiagame/NonlinearEvent/Editor/UI/NonlinearEventEditor.guiskin");
+            ReloadTransitions();
         }
 
         void OnGUI()
@@ -51,6 +68,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             Background();
             GUI.skin = _skin;
             ShowRightMouseMenu();
+            Transitions();
             DrawEventNodes();
             DrawRightPanel();
             GUI.skin = null;
@@ -74,6 +92,10 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void ShowRightMouseMenu()
         {
+            if (_state != State.Idle)
+            {
+                return;
+            }
             Event currentEvent = Event.current;
             switch (currentEvent.type)
             {
@@ -215,10 +237,14 @@ namespace Dajiagame.NonlinearEvent.Editor
         private void ShowNodeMenu()
         {
             GenericMenu menu = new GenericMenu();
-            foreach (var selection in EventGroup.Config.Selections)
+            for (int i = 0; i < EventGroup.Config.Transitions.Count; i++)
             {
-                menu.AddItem(new GUIContent(selection.Name), false, delegate {
-
+                var selection = EventGroup.Config.Transitions[i];
+                var currentTransitionType = i;
+                menu.AddItem(new GUIContent(selection.Name), false, delegate
+                {
+                    _state = State.ConnectTransition;
+                    _currentTransitionType = currentTransitionType;
                 });
             }
             menu.ShowAsContext();
@@ -229,7 +255,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             if (EventGroup.ListNodes == null)
             {
                 EventGroup.ListNodes = new List<EventNode>();
-                _lastEventID = 0;
+                _lastEventID = 1;
             }
             EventNode newNode = new EventNode
             {
@@ -299,9 +325,160 @@ namespace Dajiagame.NonlinearEvent.Editor
             }
             _eventGroupFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
             EventGroup = AssetDatabase.LoadAssetAtPath<NonlinearEventGroup>(_eventGroupFilePath);
+            _lastEventID = EventGroup.GetLastEventID() + 1;
+            ReloadTransitions();
         }
 
-#endregion
+        private void ReloadTransitions()
+        {
+            _listTransitions = new List<Transition>();
+            if (EventGroup == null)
+            {
+                return;
+            }
+
+            if (EventGroup.ListNodes == null)
+            {
+                return;
+            }
+
+            foreach (var eventNode in EventGroup.ListNodes)
+            {
+                for (int i = 0; i < eventNode.NextEventIDs.Count; i++)
+                {
+                    var nextEventID = eventNode.NextEventIDs[i];
+                    if (nextEventID > 0)
+                    {
+                        _listTransitions.Add(new Transition(eventNode.ID, nextEventID, i));
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Transition
+
+        private class Transition
+        {
+            public int StartNode;
+            public int EndNode;
+            public int TransitionType;
+
+            public Transition(int startNode, int endNode, int transitionType)
+            {
+                StartNode = startNode;
+                EndNode = endNode;
+                TransitionType = transitionType;
+            }
+        }
+
+        private void Transitions()
+        {
+            if (_state == State.ConnectTransition)
+            {
+                Event currentEvent = Event.current;
+                switch (currentEvent.type) {
+                    case EventType.MouseUp:
+                        if (currentEvent.button == 0)
+                        {
+                            //遍历Node查找点中的
+                            bool found = false;
+                            foreach (var eventNode in EventGroup.ListNodes)
+                            {
+                                if (PointInNodeDrawRect(eventNode, currentEvent.mousePosition))
+                                {
+                                    _selectedNode.AddNextEventNode(_currentTransitionType, eventNode.ID);
+                                    AddTransition(_selectedNode.ID, eventNode.ID, _currentTransitionType);
+                                    found = true;
+                                }
+                            }
+                            //如果没有点中的，创建一个新node并自动连接
+                            if (!found)
+                            {
+                                
+                            }
+                            _state = State.Idle;
+                        }
+                        if (currentEvent.button == 1)
+                        {
+                            //右键取消连接操作
+                            _state = State.Idle;
+                        }
+                        break;
+                }
+            }
+
+            DrawTransitions();
+
+            DrawMouseTransition();
+        }
+
+        private void DrawTransitions()
+        {
+            if (_listTransitions == null)
+            {
+                return;
+            }
+            foreach (var transition in _listTransitions)
+            {
+                if (transition.TransitionType < EventGroup.Config.Transitions.Count)
+                {
+                    Color color = EventGroup.Config.Transitions[transition.TransitionType].Color;
+                    DrawTransition(transition, color);
+                }
+                
+            }
+        }
+
+        private void DrawMouseTransition()
+        {
+            if (_state != State.ConnectTransition)
+            {
+                return;
+            }
+            if (_selectedNode == null)
+            {
+                return;
+            }
+            Color color = EventGroup.Config.Transitions[_currentTransitionType].Color;
+            DrawTransitionToMouse(_selectedNode.ID, Event.current.mousePosition, color);
+        }
+
+        private void DrawTransition(Transition transition, Color color)
+        {
+            Handles.color = color;
+            Vector2 posStart = EventGroup.GetNode(transition.StartNode).Position+_nodeSize/2;
+            Vector2 posEnd = EventGroup.GetNode(transition.EndNode).Position + _nodeSize / 2;
+            Handles.DrawBezier(posStart + _offset, posEnd + _offset, posStart + _offset, posEnd + _offset, color, NodeStyles.connectionTexture, 3f);
+        }
+
+        private void DrawTransitionToMouse(int nodeID, Vector2 posMouse, Color color)
+        {
+            Handles.color = color;
+            Vector2 posStart = EventGroup.GetNode(nodeID).Position + _nodeSize / 2;
+            Handles.DrawBezier(posStart + _offset, posMouse, posStart + _offset, posMouse, color, NodeStyles.connectionTexture, 3f);
+        }
+
+        private void AddTransition(int startNodeID, int endNodeID, int transitionType)
+        {
+            if (_listTransitions == null)
+            {
+                _listTransitions = new List<Transition>();
+            }
+            Transition exist =
+                _listTransitions.Find(_ => _.StartNode == startNodeID && _.TransitionType == transitionType);
+            if (exist!=null)
+            {
+                exist.EndNode = endNodeID;
+            } else
+            {
+                _listTransitions.Add(new Transition(startNodeID, endNodeID, transitionType));
+            }
+            
+        }
+
+        #endregion
 
     }
 }
