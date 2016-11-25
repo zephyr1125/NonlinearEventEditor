@@ -50,6 +50,8 @@ namespace Dajiagame.NonlinearEvent.Editor
             ConnectTransition
         }
 
+        private string[] _popUpCharacterNames;
+
         [MenuItem("DajiaGame/非线性事件编辑器")]
         static void OnInit()
         {
@@ -126,10 +128,11 @@ namespace Dajiagame.NonlinearEvent.Editor
             EditorGUILayout.BeginVertical();
             {
                 GUILayout.Label("设置节点数据",_skin.GetStyle("Title"));
+                _selectedNode.CharacterID = EditorGUILayout.Popup("说话者", _selectedNode.CharacterID, _popUpCharacterNames);
                 GUILayout.Label("简介文本");
-                _selectedNode.PreviewText = GUILayout.TextField(_selectedNode.PreviewText);
+                _selectedNode.PreviewText = EditorGUILayout.TextField(_selectedNode.PreviewText);
                 GUILayout.Label("主文本");
-                _selectedNode.Text = GUILayout.TextArea(_selectedNode.Text,GUILayout.Height(128));
+                _selectedNode.Text = EditorGUILayout.TextField(_selectedNode.Text, _skin.GetStyle("Talk"), GUILayout.Height(128));
             }
             EditorGUILayout.EndVertical();
             GUILayout.EndArea();
@@ -221,17 +224,18 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void DrawNode(EventNode node, Rect controlRect)
         {
+            Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);           
+            GUI.Label(drawRect, "", _skin.GetStyle("Node"));
             if (node == _selectedNode) {
                 GUI.color = Color.cyan;
             }
-
-            Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);           
-            GUI.Label(drawRect, "", _skin.GetStyle("Node"));
-            GUI.Label(new Rect(drawRect.x, drawRect.y, drawRect.width, 24), "这里是标题", _skin.GetStyle("Title"));
-            GUI.Label(new Rect(drawRect.x, drawRect.y + 23, drawRect.width, 64),
-                node.Text, _skin.GetStyle("Talk"));
-
+            GUI.Label(new Rect(drawRect.x, drawRect.y, 24, 24), ""+node.ID, _skin.GetStyle("ID"));
+            GUI.Label(new Rect(drawRect.x+23, drawRect.y, drawRect.width-23, 24), node.PreviewText, _skin.GetStyle("Title"));
             GUI.color = Color.white;
+            GUI.DrawTexture(new Rect(drawRect.x, drawRect.y + 23, 48, 48), EventGroup.Config.Characters[node.CharacterID].Icon);
+            GUI.Label(new Rect(drawRect.x, drawRect.y + 23 + 47, 48, 16), EventGroup.Config.Characters[node.CharacterID].Name, _skin.GetStyle("CharName"));
+            GUI.Label(new Rect(drawRect.x + 47, drawRect.y + 23, drawRect.width-47, 64),
+                node.Text, _skin.GetStyle("Talk"));
         }
 
         private void ShowNodeMenu()
@@ -327,6 +331,17 @@ namespace Dajiagame.NonlinearEvent.Editor
             EventGroup = AssetDatabase.LoadAssetAtPath<NonlinearEventGroup>(_eventGroupFilePath);
             _lastEventID = EventGroup.GetLastEventID() + 1;
             ReloadTransitions();
+            UpdatePopUpCharacterNames();
+        }
+
+        public void UpdatePopUpCharacterNames()
+        {
+            Config config = EventGroup.Config;
+            _popUpCharacterNames = new string[config.Characters.Count];
+            for (int i = 0; i < config.Characters.Count; i++) {
+                var character = config.Characters[i];
+                _popUpCharacterNames[i] = character.Name;
+            }
         }
 
         private void ReloadTransitions()

@@ -14,6 +14,8 @@ namespace Dajiagame.NonlinearEvent
         /// </summary>
         public List<int> NextEventIDs = new List<int>();
 
+        public int CharacterID;
+
         public string Text = "文本";
         public string PreviewText = "简介文本";
 

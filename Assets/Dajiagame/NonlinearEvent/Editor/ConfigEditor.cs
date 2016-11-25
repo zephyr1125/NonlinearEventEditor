@@ -76,13 +76,14 @@ namespace Dajiagame.NonlinearEvent.Editor
                     _config.Characters[i].Icon = (Texture2D)EditorGUILayout.ObjectField(_config.Characters[i].Icon, typeof(Texture2D), false, GUILayout.Width(64), GUILayout.Height(64));
                     //移除按钮
                     if (GUILayout.Button("-", GUILayout.Width(64), GUILayout.Height(16))) {
-                        _config.Characters.RemoveAt(i);
+                        _config.Characters.RemoveAt(i);                        
                     }
                 }
             }
             if (GUILayout.Button("+", GUILayout.Width(32), GUILayout.Height(107))) {
                 _config.Characters.Add(new Config.Character());
             }
+            EventEditor.Instance.UpdatePopUpCharacterNames();
             EditorUtility.SetDirty(EventEditor.Instance.EventGroup);
         }
 

@@ -31,38 +31,51 @@ MonoBehaviour:
       Color: {r: 0.38235274, g: 0.3602941, b: 1, a: 1}
   ListNodes:
   - ID: 1
-    NextEventIDs: 020000000000000003000000
-    Text: "\u6587\u672C111"
-    PreviewText: "\u7B80\u4ECB\u6587\u672C"
+    NextEventIDs: 020000000300000007000000
+    CharacterID: 0
+    Text: "\u7C73\u8001\u9F201928\u5E7411\u670818\u65E5\u5728\u7EBD\u7EA6\u6B96\u6C11\u5730\u5267\u9662\u4E0A\u6620\u7684\u300A\u6C7D\u8239\u5A01\u5229\u300B\u4E2D\u521D\u6B21\u767B\u53F0\u3002\u300A\u6C7D\u8239\u5A01\u5229\u300B\u662F\u4E16\u754C\u7B2C\u4E00\u6B65\u58F0\u97F3\u4E0E\u753B\u9762\u540C\u6B65\u7684\u5361\u901A\uFF0C\u4EAE\u70B9\u662F\u534E\u7279\xB7\u8FEA\u58EB\u5C3C\u4EB2\u81EA\u7ED9\u7C73\u8001\u9F20\u5431\u5431\u5431\u7684\u58F0\u97F3\u3002"
+    PreviewText: "\u7B80\u4ECB\u6587\u672C222"
     Effects: 
-    Position: {x: 512, y: 0}
+    Position: {x: 576, y: 0}
   - ID: 2
     NextEventIDs: 050000000400000006000000
+    CharacterID: 0
     Text: "\u6587\u672C22"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
-    Position: {x: 256, y: 192}
+    Position: {x: 320, y: 192}
   - ID: 3
-    NextEventIDs: 
+    NextEventIDs: 07000000
+    CharacterID: 0
     Text: "\u6587\u672C"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
-    Position: {x: 768, y: 192}
+    Position: {x: 832, y: 192}
   - ID: 4
     NextEventIDs: 
+    CharacterID: 0
     Text: "\u6587\u672C"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
     Position: {x: 320, y: 384}
   - ID: 5
     NextEventIDs: 
+    CharacterID: 0
     Text: "\u6587\u672C"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
     Position: {x: 64, y: 384}
   - ID: 6
-    NextEventIDs: 
+    NextEventIDs: 0000000000000000
+    CharacterID: 0
     Text: "\u6587\u672C"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
     Position: {x: 576, y: 384}
+  - ID: 7
+    NextEventIDs: 
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    PreviewText: "\u7B80\u4ECB\u6587\u672C"
+    Effects: 
+    Position: {x: 832, y: 384}
