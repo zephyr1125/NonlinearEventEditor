@@ -27,18 +27,26 @@ namespace Dajiagame.NonlinearEvent
         /// </summary>
         public Vector2 Position;
 
-        public void AddNextEventNode(int connectionID, int nextNodeID)
+        public void AddNextEventNode(int transitionType, int nextNodeID)
         {
             if (NextEventIDs == null)
             {
                 NextEventIDs = new List<int>();
             }
-            while (NextEventIDs.Count <= connectionID)
+            while (NextEventIDs.Count <= transitionType)
             {
                 NextEventIDs.Add(0);
             }
-            NextEventIDs[connectionID] = nextNodeID;
+            NextEventIDs[transitionType] = nextNodeID;
         }
 
+        public void RemoveNextEventNode(int transitionType)
+        {
+            if (NextEventIDs == null)
+            {
+                return;
+            }
+            NextEventIDs[transitionType] = 0;
+        }
     }
 }

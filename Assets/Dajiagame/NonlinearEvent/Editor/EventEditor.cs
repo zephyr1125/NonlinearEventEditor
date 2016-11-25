@@ -393,10 +393,19 @@ namespace Dajiagame.NonlinearEvent.Editor
                                     found = true;
                                 }
                             }
-                            //如果没有点中的，创建一个新node并自动连接
+                            //如果没有点中的，表示删除原有连接
                             if (!found)
                             {
-                                
+                                Transition exist =
+                                    _listTransitions.Find(
+                                        _ =>
+                                            _.StartNode == _selectedNode.ID &&
+                                            _.TransitionType == _currentTransitionType);
+                                if (exist != null)
+                                {
+                                    _listTransitions.Remove(exist);
+                                    _selectedNode.RemoveNextEventNode(_currentTransitionType);
+                                }
                             }
                             _state = State.Idle;
                         }
@@ -451,6 +460,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             Vector2 posStart = EventGroup.GetNode(transition.StartNode).Position+_nodeSize/2;
             Vector2 posEnd = EventGroup.GetNode(transition.EndNode).Position + _nodeSize / 2;
             Handles.DrawBezier(posStart + _offset, posEnd + _offset, posStart + _offset, posEnd + _offset, color, NodeStyles.connectionTexture, 3f);
+            DrawArrow(posStart+_offset, posEnd+_offset);
         }
 
         private void DrawTransitionToMouse(int nodeID, Vector2 posMouse, Color color)
@@ -458,6 +468,18 @@ namespace Dajiagame.NonlinearEvent.Editor
             Handles.color = color;
             Vector2 posStart = EventGroup.GetNode(nodeID).Position + _nodeSize / 2;
             Handles.DrawBezier(posStart + _offset, posMouse, posStart + _offset, posMouse, color, NodeStyles.connectionTexture, 3f);
+            DrawArrow(posStart + _offset, posMouse);
+        }
+
+        private void DrawArrow(Vector2 posStart, Vector2 posEnd)
+        {
+            float dis = Vector2.Distance(posEnd, posStart);
+            Vector2 nor = (posEnd - posStart).normalized;
+            Vector2 cross = nor * (dis * 0.2f) + posStart;
+            Quaternion q = Quaternion.FromToRotation(Vector3.back, posStart - posEnd);
+            //		Handles.Label (cross, arrows.ToString());
+            cross = nor * (dis * 0.5f) + posStart;
+            Handles.ConeCap(0, new Vector3(cross.x, cross.y, -100), q, 18);
         }
 
         private void AddTransition(int startNodeID, int endNodeID, int transitionType)

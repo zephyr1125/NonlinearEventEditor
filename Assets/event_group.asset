@@ -31,20 +31,38 @@ MonoBehaviour:
       Color: {r: 0.38235274, g: 0.3602941, b: 1, a: 1}
   ListNodes:
   - ID: 1
-    NextEventIDs: 000000000000000002000000
+    NextEventIDs: 020000000000000003000000
     Text: "\u6587\u672C111"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
-    Position: {x: 704, y: 0}
+    Position: {x: 512, y: 0}
   - ID: 2
-    NextEventIDs: 0000000003000000
+    NextEventIDs: 050000000400000006000000
     Text: "\u6587\u672C22"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
-    Position: {x: 448, y: 192}
+    Position: {x: 256, y: 192}
   - ID: 3
     NextEventIDs: 
     Text: "\u6587\u672C"
     PreviewText: "\u7B80\u4ECB\u6587\u672C"
     Effects: 
-    Position: {x: 448, y: 384}
+    Position: {x: 768, y: 192}
+  - ID: 4
+    NextEventIDs: 
+    Text: "\u6587\u672C"
+    PreviewText: "\u7B80\u4ECB\u6587\u672C"
+    Effects: 
+    Position: {x: 320, y: 384}
+  - ID: 5
+    NextEventIDs: 
+    Text: "\u6587\u672C"
+    PreviewText: "\u7B80\u4ECB\u6587\u672C"
+    Effects: 
+    Position: {x: 64, y: 384}
+  - ID: 6
+    NextEventIDs: 
+    Text: "\u6587\u672C"
+    PreviewText: "\u7B80\u4ECB\u6587\u672C"
+    Effects: 
+    Position: {x: 576, y: 384}
