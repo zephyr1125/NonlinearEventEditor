@@ -33,14 +33,10 @@ namespace Dajiagame.NonlinearEvent.Editor
                 }
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.Separator();
-                EditorGUILayout.LabelField("选项分支的名称与颜色");
-                EditorGUILayout.BeginHorizontal();
-                {
-                    DrawSelections();
-                }
-                EditorGUILayout.EndHorizontal();
+                _config.DefaultSelectionCount = EditorGUILayout.IntField("默认选项数量", _config.DefaultSelectionCount);
             }
             EditorGUILayout.EndVertical();
+            EditorUtility.SetDirty(EventEditor.Instance.EventGroup);
         }
 
         private void DrawEffects()
@@ -63,7 +59,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             {
                 _config.Effects.Add(new Config.Effect());
             }
-            EditorUtility.SetDirty(EventEditor.Instance.EventGroup);
+            
         }
 
         private void DrawCharacters()
@@ -84,27 +80,7 @@ namespace Dajiagame.NonlinearEvent.Editor
                 _config.Characters.Add(new Config.Character());
             }
             EventEditor.Instance.UpdatePopUpCharacterNames();
-            EditorUtility.SetDirty(EventEditor.Instance.EventGroup);
         }
 
-        private void DrawSelections()
-        {
-            for (int i = 0; i < _config.Transitions.Count; i++) {
-                using (new EditorGUILayout.VerticalScope("box")) {
-                    //名称
-                    _config.Transitions[i].Name = EditorGUILayout.TextField(_config.Transitions[i].Name, GUILayout.Width(64));
-                    //颜色
-                    _config.Transitions[i].Color = EditorGUILayout.ColorField(_config.Transitions[i].Color, GUILayout.Width(64), GUILayout.Height(16));
-                    //移除按钮
-                    if (GUILayout.Button("-", GUILayout.Width(64), GUILayout.Height(16))) {
-                        _config.Transitions.RemoveAt(i);
-                    }
-                }
-            }
-            if (GUILayout.Button("+", GUILayout.Width(32), GUILayout.Height(60))) {
-                _config.Transitions.Add(new Config.Transition());
-            }
-            EditorUtility.SetDirty(EventEditor.Instance.EventGroup);
-        }
     }
 }

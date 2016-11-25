@@ -18,9 +18,9 @@ namespace Dajiagame.NonlinearEvent
         public List<Character> Characters = new List<Character>();
 
         /// <summary>
-        /// 选项分支设置：数量、颜色、名称
+        /// 选项默认数量
         /// </summary>
-        public List<Transition> Transitions = new List<Transition>();
+        public int DefaultSelectionCount;
 
         [Serializable]
         public class Effect
@@ -36,11 +36,5 @@ namespace Dajiagame.NonlinearEvent
             public Texture2D Icon;
         }
 
-        [Serializable]
-        public class Transition
-        {
-            public string Name;
-            public Color Color;
-        }
     }
 }

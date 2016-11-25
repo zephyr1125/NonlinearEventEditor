@@ -129,8 +129,6 @@ namespace Dajiagame.NonlinearEvent.Editor
             {
                 GUILayout.Label("设置节点数据",_skin.GetStyle("Title"));
                 _selectedNode.CharacterID = EditorGUILayout.Popup("说话者", _selectedNode.CharacterID, _popUpCharacterNames);
-                GUILayout.Label("简介文本");
-                _selectedNode.PreviewText = EditorGUILayout.TextField(_selectedNode.PreviewText);
                 GUILayout.Label("主文本");
                 _selectedNode.Text = EditorGUILayout.TextField(_selectedNode.Text, _skin.GetStyle("Talk"), GUILayout.Height(128));
             }
@@ -229,29 +227,55 @@ namespace Dajiagame.NonlinearEvent.Editor
             if (node == _selectedNode) {
                 GUI.color = Color.cyan;
             }
-            GUI.Label(new Rect(drawRect.x, drawRect.y, 24, 24), ""+node.ID, _skin.GetStyle("ID"));
-            GUI.Label(new Rect(drawRect.x+23, drawRect.y, drawRect.width-23, 24), node.PreviewText, _skin.GetStyle("Title"));
+
+            int height = 24;
+            int y = (int)drawRect.y;
+            
+            GUI.Label(new Rect(drawRect.x, y, 24, height), ""+node.ID, _skin.GetStyle("ID"));
             GUI.color = Color.white;
-            GUI.DrawTexture(new Rect(drawRect.x, drawRect.y + 23, 48, 48), EventGroup.Config.Characters[node.CharacterID].Icon);
-            GUI.Label(new Rect(drawRect.x, drawRect.y + 23 + 47, 48, 16), EventGroup.Config.Characters[node.CharacterID].Name, _skin.GetStyle("CharName"));
-            GUI.Label(new Rect(drawRect.x + 47, drawRect.y + 23, drawRect.width-47, 64),
-                node.Text, _skin.GetStyle("Talk"));
+
+            y += height - 1;
+            height = 64;
+            GUI.DrawTexture(new Rect(drawRect.x, y+1, 48, 48), EventGroup.Config.Characters[node.CharacterID].Icon);
+            GUI.Label(new Rect(drawRect.x, y+1 + 47, 48, 16), EventGroup.Config.Characters[node.CharacterID].Name, _skin.GetStyle("CharName"));
+            GUI.Label(new Rect(drawRect.x + 47, y, drawRect.width - 47, height), node.Text, _skin.GetStyle("Talk"));
+
+            y += height - 1;
+            height = (int)(drawRect.height-(y-drawRect.y));
+
+            int width = (int)drawRect.width/ node.Selections.Count;
+            for (int i = 0; i < node.Selections.Count; i++)
+            {
+                DrawNodeSelection(new Rect(drawRect.x + width*i -i, y, width, height), node.Selections[i]);
+            }
+        }
+
+        private void DrawNodeSelection(Rect drawRect, EventNode.Selection selection)
+        {
+            GUI.Label(drawRect, "", _skin.GetStyle("Node"));
+            GUI.Label(new Rect(drawRect.x, drawRect.y, drawRect.width, 18), selection.Text, _skin.GetStyle("SelectionText"));
         }
 
         private void ShowNodeMenu()
         {
             GenericMenu menu = new GenericMenu();
-            for (int i = 0; i < EventGroup.Config.Transitions.Count; i++)
-            {
-                var selection = EventGroup.Config.Transitions[i];
-                var currentTransitionType = i;
-                menu.AddItem(new GUIContent(selection.Name), false, delegate
-                {
-                    _state = State.ConnectTransition;
-                    _currentTransitionType = currentTransitionType;
-                });
-            }
+            menu.AddItem(new GUIContent("删除节点"), false, DeleteNode);
+            //for (int i = 0; i < EventGroup.Config.Transitions.Count; i++) {
+            //    var selection = EventGroup.Config.Transitions[i];
+            //    var currentTransitionType = i;
+            //    menu.AddItem(new GUIContent(selection.Name), false, delegate
+            //    {
+            //        _state = State.ConnectTransition;
+            //        _currentTransitionType = currentTransitionType;
+            //    });
+            //}
             menu.ShowAsContext();
+        }
+
+        private void DeleteNode()
+        {
+            EventGroup.ListNodes.Remove(_selectedNode);
+            _selectedNode = null;
         }
 
         private void CreateNewNode(Vector2 createAt)
@@ -264,10 +288,19 @@ namespace Dajiagame.NonlinearEvent.Editor
             EventNode newNode = new EventNode
             {
                 ID =  _lastEventID,
-                Position = createAt
+                Position = createAt,
             };
+            for (int i = 0; i < EventGroup.Config.DefaultSelectionCount; i++)
+            {
+                AddNodeSelection(newNode);
+            }
             EventGroup.ListNodes.Add(newNode);
             _lastEventID++;
+        }
+
+        private void AddNodeSelection(EventNode node)
+        {
+            node.Selections.Add(new EventNode.Selection());
         }
 
         #endregion
@@ -359,9 +392,9 @@ namespace Dajiagame.NonlinearEvent.Editor
 
             foreach (var eventNode in EventGroup.ListNodes)
             {
-                for (int i = 0; i < eventNode.NextEventIDs.Count; i++)
+                for (int i = 0; i < eventNode.Selections.Count; i++)
                 {
-                    var nextEventID = eventNode.NextEventIDs[i];
+                    var nextEventID = eventNode.Selections[i].NextEventID;
                     if (nextEventID > 0)
                     {
                         _listTransitions.Add(new Transition(eventNode.ID, nextEventID, i));
@@ -440,33 +473,33 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void DrawTransitions()
         {
-            if (_listTransitions == null)
-            {
-                return;
-            }
-            foreach (var transition in _listTransitions)
-            {
-                if (transition.TransitionType < EventGroup.Config.Transitions.Count)
-                {
-                    Color color = EventGroup.Config.Transitions[transition.TransitionType].Color;
-                    DrawTransition(transition, color);
-                }
+            //if (_listTransitions == null)
+            //{
+            //    return;
+            //}
+            //foreach (var transition in _listTransitions)
+            //{
+            //    if (transition.TransitionType < EventGroup.Config.Transitions.Count)
+            //    {
+            //        Color color = EventGroup.Config.Transitions[transition.TransitionType].Color;
+            //        DrawTransition(transition, color);
+            //    }
                 
-            }
+            //}
         }
 
         private void DrawMouseTransition()
         {
-            if (_state != State.ConnectTransition)
-            {
-                return;
-            }
-            if (_selectedNode == null)
-            {
-                return;
-            }
-            Color color = EventGroup.Config.Transitions[_currentTransitionType].Color;
-            DrawTransitionToMouse(_selectedNode.ID, Event.current.mousePosition, color);
+            //if (_state != State.ConnectTransition)
+            //{
+            //    return;
+            //}
+            //if (_selectedNode == null)
+            //{
+            //    return;
+            //}
+            //Color color = EventGroup.Config.Transitions[_currentTransitionType].Color;
+            //DrawTransitionToMouse(_selectedNode.ID, Event.current.mousePosition, color);
         }
 
         private void DrawTransition(Transition transition, Color color)
