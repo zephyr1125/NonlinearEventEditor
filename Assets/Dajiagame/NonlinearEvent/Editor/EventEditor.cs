@@ -49,7 +49,6 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private Color[] SelectionColors = {
             new Color(1,0.6f,0.6f), 
-            Color.cyan,
             Color.green
         };
 
@@ -140,9 +139,31 @@ namespace Dajiagame.NonlinearEvent.Editor
                 _selectedNode.CharacterID = EditorGUILayout.Popup("说话者", _selectedNode.CharacterID, _popUpCharacterNames);
                 GUILayout.Label("主文本");
                 _selectedNode.Text = EditorGUILayout.TextField(_selectedNode.Text, _skin.GetStyle("Talk"), GUILayout.Height(128));
+                for (int i = 0; i < _selectedNode.Selections.Count; i++)
+                {
+                    DrawRightPanelSelection(i);
+                }
             }
             EditorGUILayout.EndVertical();
             GUILayout.EndArea();
+        }
+
+        private void DrawRightPanelSelection(int selectionID)
+        {
+            GUILayout.Label("选项"+(selectionID+1)+"设置", _skin.GetStyle("Title"));
+            GUILayout.Label("选项文本");
+            _selectedNode.Selections[selectionID].Text = GUILayout.TextField(
+                _selectedNode.Selections[selectionID].Text, _skin.GetStyle("Talk"));
+            for (int i = 0; i < EventGroup.Config.Effects.Count; i++)
+            {
+                while (_selectedNode.Selections[selectionID].Effects.Count <= i)
+                {
+                    _selectedNode.Selections[selectionID].Effects.Add(0);
+                };
+                _selectedNode.Selections[selectionID].Effects[i] = EditorGUILayout.IntField(
+                new GUIContent(EventGroup.Config.Effects[i].Name, EventGroup.Config.Effects[i].Icon),
+                _selectedNode.Selections[selectionID].Effects[i]);
+            }
         }
 
         #region background
@@ -266,6 +287,19 @@ namespace Dajiagame.NonlinearEvent.Editor
             GUI.color = Color.white;
         }
 
+        private Color GetSelectionColor(int selectionID)
+        {
+            if (selectionID < SelectionColors.Length)
+            {
+                return SelectionColors[selectionID];
+            }
+            else
+            {
+                return Color.white;
+            }
+            
+        }
+
         /// <summary>
         /// 更新缓存的Node的Selection的绘制Rect
         /// </summary>
@@ -289,16 +323,20 @@ namespace Dajiagame.NonlinearEvent.Editor
             GUI.Label(drawRect, "", _skin.GetStyle("Node"));
             //文字
             Color prevContentColor = GUI.contentColor;
-            GUI.contentColor = SelectionColors[selectionID];
+            GUI.contentColor = GetSelectionColor(selectionID);
             GUI.Label(new Rect(drawRect.x, drawRect.y, drawRect.width, 18), selection.Text, _skin.GetStyle("SelectionText"));
             GUI.contentColor = prevContentColor;
             //属性效果
+            int drawID = 0;
             for (int i = 0; i < selection.Effects.Count; i++)
             {
-                var effectRect = new Rect(drawRect.x+(i%3)*37, drawRect.y+17+((int)i/3)*17, 38, 18);
+                int effect = selection.Effects[i];
+                if (effect == 0) continue;
+                var effectRect = new Rect(drawRect.x+(drawID % 3)*37, drawRect.y+17+((int)drawID / 3)*17, 38, 18);
                 GUI.Label(effectRect, "", _skin.GetStyle("Node"));
                 GUI.DrawTexture(new Rect(effectRect.x+1, effectRect.y+1, 16, 16), EventGroup.Config.Effects[i].Icon);
-                GUI.Label(new Rect(effectRect.x + 17, effectRect.y, 21, 18), ""+selection.Effects[i], _skin.GetStyle("EffectNum"));
+                GUI.Label(new Rect(effectRect.x + 17, effectRect.y, 21, 18), ""+ effect, _skin.GetStyle("EffectNum"));
+                drawID++;
             }
         }
 
@@ -550,7 +588,7 @@ namespace Dajiagame.NonlinearEvent.Editor
                 return;
             }
             foreach (var transition in _listTransitions) {
-                Color color = SelectionColors[transition.TransitionType];
+                Color color = GetSelectionColor(transition.TransitionType);
                 DrawTransition(transition, color);
             }
         }
@@ -581,7 +619,7 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void DrawTransitionToMouse()
         {
-            Color color = SelectionColors[_currentTransitionType];
+            Color color = GetSelectionColor(_currentTransitionType);
             Handles.color = color;
             Vector2 posMouse = Event.current.mousePosition;
             int selectionCount = _selectedNode.Selections.Count;
