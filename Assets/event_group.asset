@@ -17,6 +17,12 @@ MonoBehaviour:
       Icon: {fileID: 2800000, guid: abf37bf659663c9419dd3915b102fc83, type: 3}
     - Name: B
       Icon: {fileID: 2800000, guid: 3ad304273bd51ee4c901c8af013b7a01, type: 3}
+    - Name: C
+      Icon: {fileID: 2800000, guid: b5f3b9f990f490349b4ba643c6f38307, type: 3}
+    - Name: D
+      Icon: {fileID: 2800000, guid: e881292be367a0b47ae2901b7e13e0b2, type: 3}
+    - Name: E
+      Icon: {fileID: 2800000, guid: 92366fc39aaf0bd488d6575f05363988, type: 3}
     Characters:
     - Name: A
       Icon: {fileID: 2800000, guid: 83de905e072635c49bb62d63f9059800, type: 3}
@@ -25,6 +31,17 @@ MonoBehaviour:
     DefaultSelectionCount: 2
   ListNodes:
   - ID: 1
+    CharacterID: 1
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: "\uFF08\u6447\u5934\uFF09"
+      Effects: 
+      NextEventID: 11
+    - Text: "\uFF08\u70B9\u5934\uFF09"
+      Effects: 
+      NextEventID: 10
+    Position: {x: 256, y: 0}
+  - ID: 5
     CharacterID: 0
     Text: "\u6587\u672C"
     Selections:
@@ -34,8 +51,8 @@ MonoBehaviour:
     - Text: 
       Effects: 
       NextEventID: 0
-    Position: {x: 576, y: 128}
-  - ID: 2
+    Position: {x: 0, y: 576}
+  - ID: 7
     CharacterID: 0
     Text: "\u6587\u672C"
     Selections:
@@ -45,4 +62,103 @@ MonoBehaviour:
     - Text: 
       Effects: 
       NextEventID: 0
-    Position: {x: 320, y: 320}
+    Position: {x: 0, y: 384}
+  - ID: 8
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 
+      NextEventID: 0
+    - Text: 
+      Effects: 
+      NextEventID: 0
+    Position: {x: 0, y: 0}
+  - ID: 9
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 
+      NextEventID: 0
+    - Text: 
+      Effects: 
+      NextEventID: 0
+    Position: {x: 0, y: 192}
+  - ID: 10
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 
+      NextEventID: 0
+    - Text: 
+      Effects: 
+      NextEventID: 0
+    Position: {x: 512, y: 192}
+  - ID: 11
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 
+      NextEventID: 0
+    - Text: 
+      Effects: 
+      NextEventID: 0
+    Position: {x: 256, y: 192}
+  - ID: 12
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 
+      NextEventID: 0
+    - Text: 
+      Effects: 
+      NextEventID: 0
+    Position: {x: 512, y: 0}
+  - ID: 13
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 0000000000000000
+      NextEventID: 0
+    - Text: 
+      Effects: 0000000000000000
+      NextEventID: 0
+    Position: {x: 768, y: 0}
+  - ID: 14
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 0000000000000000
+      NextEventID: 0
+    - Text: 
+      Effects: 63000000ecffffff
+      NextEventID: 0
+    Position: {x: 768, y: 192}
+  - ID: 15
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 000000000000000000000000
+      NextEventID: 0
+    - Text: 
+      Effects: 000000000000000000000000
+      NextEventID: 0
+    Position: {x: 256, y: 384}
+  - ID: 16
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 0000000000000000000000000000000000000000
+      NextEventID: 0
+    - Text: 
+      Effects: 0000000000000000000000000000000000000000
+      NextEventID: 0
+    Position: {x: 512, y: 384}

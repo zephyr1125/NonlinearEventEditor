@@ -37,6 +37,14 @@ namespace Dajiagame.NonlinearEvent
             /// </summary>
             public int NextEventID;
 
+            public Selection(int effectCount)
+            {
+                Effects = new List<int>(effectCount);
+                while (Effects.Count<effectCount)
+                {
+                    Effects.Add(0);
+                }
+            }
         }
 
         /// <summary>

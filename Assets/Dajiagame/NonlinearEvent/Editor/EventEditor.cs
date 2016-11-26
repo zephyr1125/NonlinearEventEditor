@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using NodeCanvas;
 using UnityEditor;
 using UnityEngine;
@@ -33,6 +31,11 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private EventNode _selectedNode;
 
+        /// <summary>
+        /// 当前选中的Node的各个Selection的Rect,为右键菜单的定位缓存下来
+        /// </summary>
+        private List<Rect> _selectedNodeSelectionRects; 
+
         private int _lastEventID;
 
         private List<Transition> _listTransitions;
@@ -43,6 +46,12 @@ namespace Dajiagame.NonlinearEvent.Editor
         private int _currentTransitionType;
 
         private State _state;
+
+        private Color[] SelectionColors = {
+            new Color(1,0.6f,0.6f), 
+            Color.cyan,
+            Color.green
+        };
 
         private enum State
         {
@@ -222,17 +231,17 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void DrawNode(EventNode node, Rect controlRect)
         {
-            Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);           
-            GUI.Label(drawRect, "", _skin.GetStyle("Node"));
             if (node == _selectedNode) {
                 GUI.color = Color.cyan;
             }
+            Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);       
+            GUI.Label(drawRect, "", _skin.GetStyle("Node"));
 
             int height = 24;
             int y = (int)drawRect.y;
             
             GUI.Label(new Rect(drawRect.x, y, 24, height), ""+node.ID, _skin.GetStyle("ID"));
-            GUI.color = Color.white;
+            
 
             y += height - 1;
             height = 64;
@@ -246,36 +255,100 @@ namespace Dajiagame.NonlinearEvent.Editor
             int width = (int)drawRect.width/ node.Selections.Count;
             for (int i = 0; i < node.Selections.Count; i++)
             {
-                DrawNodeSelection(new Rect(drawRect.x + width*i -i, y, width, height), node.Selections[i]);
+                Rect rect = new Rect(drawRect.x + width*i - i, y, width, height);
+                DrawNodeSelection(rect, node.Selections[i], i);
+                if (node == _selectedNode)
+                {
+                    UpdateSelectedNodeSelectionRect(i, rect);
+                }
             }
+
+            GUI.color = Color.white;
         }
 
-        private void DrawNodeSelection(Rect drawRect, EventNode.Selection selection)
+        /// <summary>
+        /// 更新缓存的Node的Selection的绘制Rect
+        /// </summary>
+        /// <param name="seletionID"></param>
+        /// <param name="rect"></param>
+        private void UpdateSelectedNodeSelectionRect(int seletionID, Rect rect)
+        {
+            if (_selectedNodeSelectionRects == null)
+            {
+                _selectedNodeSelectionRects = new List<Rect>();
+            }
+            while (_selectedNodeSelectionRects.Count<= seletionID)
+            {
+                _selectedNodeSelectionRects.Add(new Rect(0,0,0,0));
+            }
+            _selectedNodeSelectionRects[seletionID] = rect;
+        }
+
+        private void DrawNodeSelection(Rect drawRect, EventNode.Selection selection, int selectionID)
         {
             GUI.Label(drawRect, "", _skin.GetStyle("Node"));
+            //文字
+            Color prevContentColor = GUI.contentColor;
+            GUI.contentColor = SelectionColors[selectionID];
             GUI.Label(new Rect(drawRect.x, drawRect.y, drawRect.width, 18), selection.Text, _skin.GetStyle("SelectionText"));
+            GUI.contentColor = prevContentColor;
+            //属性效果
+            for (int i = 0; i < selection.Effects.Count; i++)
+            {
+                var effectRect = new Rect(drawRect.x+(i%3)*37, drawRect.y+17+((int)i/3)*17, 38, 18);
+                GUI.Label(effectRect, "", _skin.GetStyle("Node"));
+                GUI.DrawTexture(new Rect(effectRect.x+1, effectRect.y+1, 16, 16), EventGroup.Config.Effects[i].Icon);
+                GUI.Label(new Rect(effectRect.x + 17, effectRect.y, 21, 18), ""+selection.Effects[i], _skin.GetStyle("EffectNum"));
+            }
         }
 
         private void ShowNodeMenu()
         {
             GenericMenu menu = new GenericMenu();
-            menu.AddItem(new GUIContent("删除节点"), false, DeleteNode);
-            //for (int i = 0; i < EventGroup.Config.Transitions.Count; i++) {
-            //    var selection = EventGroup.Config.Transitions[i];
-            //    var currentTransitionType = i;
-            //    menu.AddItem(new GUIContent(selection.Name), false, delegate
-            //    {
-            //        _state = State.ConnectTransition;
-            //        _currentTransitionType = currentTransitionType;
-            //    });
-            //}
+
+            //在各个选项的绘制范围内的话，右键菜单是连接，否则是删除
+            bool inSelection = false;
+            for (int i = 0; i < _selectedNodeSelectionRects.Count; i++)
+            {
+                var selectedNodeSelectionRect = _selectedNodeSelectionRects[i];
+                if (!selectedNodeSelectionRect.Contains(Event.current.mousePosition)) continue;
+                var currentTransitionType = i;
+                menu.AddItem(new GUIContent("连接"), false, delegate
+                {
+                    _state = State.ConnectTransition;
+                    _currentTransitionType = currentTransitionType;
+                });
+                inSelection = true;
+                break;
+            }
+
+            if (!inSelection)
+            {
+                menu.AddItem(new GUIContent("删除节点"), false, DeleteNode);
+            }
+            
             menu.ShowAsContext();
         }
 
         private void DeleteNode()
         {
+            //所有现有node断开与其的连接
+            EventGroup.ListNodes.ForEach(node =>
+            {
+                node.Selections.ForEach(selection =>
+                {
+                    if (selection.NextEventID == _selectedNode.ID)
+                    {
+                        selection.NextEventID = 0;
+                    }
+                });
+            });
+            //所有暂存Transition移除相关连接
+            _listTransitions.RemoveAll(transition => transition.StartNode == _selectedNode.ID || transition.EndNode == _selectedNode.ID);
+            //删除node
             EventGroup.ListNodes.Remove(_selectedNode);
             _selectedNode = null;
+
         }
 
         private void CreateNewNode(Vector2 createAt)
@@ -288,7 +361,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             EventNode newNode = new EventNode
             {
                 ID =  _lastEventID,
-                Position = createAt,
+                Position = createAt
             };
             for (int i = 0; i < EventGroup.Config.DefaultSelectionCount; i++)
             {
@@ -300,7 +373,7 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void AddNodeSelection(EventNode node)
         {
-            node.Selections.Add(new EventNode.Selection());
+            node.Selections.Add(new EventNode.Selection(EventGroup.Config.Effects.Count));
         }
 
         #endregion
@@ -312,7 +385,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             if (EventGroup != null) {
                 menu.AddItem(new GUIContent("新建节点"), false, delegate
                 {
-                    CreateNewNode(currentEvent.mousePosition);
+                    CreateNewNode(currentEvent.mousePosition-_offset);
                 });
                 menu.AddItem(new GUIContent("调整设置"), false, EditConfigFile);
                 menu.AddSeparator("");
@@ -473,48 +546,47 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void DrawTransitions()
         {
-            //if (_listTransitions == null)
-            //{
-            //    return;
-            //}
-            //foreach (var transition in _listTransitions)
-            //{
-            //    if (transition.TransitionType < EventGroup.Config.Transitions.Count)
-            //    {
-            //        Color color = EventGroup.Config.Transitions[transition.TransitionType].Color;
-            //        DrawTransition(transition, color);
-            //    }
-                
-            //}
+            if (_listTransitions == null) {
+                return;
+            }
+            foreach (var transition in _listTransitions) {
+                Color color = SelectionColors[transition.TransitionType];
+                DrawTransition(transition, color);
+            }
         }
 
         private void DrawMouseTransition()
         {
-            //if (_state != State.ConnectTransition)
-            //{
-            //    return;
-            //}
-            //if (_selectedNode == null)
-            //{
-            //    return;
-            //}
-            //Color color = EventGroup.Config.Transitions[_currentTransitionType].Color;
-            //DrawTransitionToMouse(_selectedNode.ID, Event.current.mousePosition, color);
+            if (_state != State.ConnectTransition) {
+                return;
+            }
+            if (_selectedNode == null) {
+                return;
+            }
+            Color color = Color.white;
+            DrawTransitionToMouse();
         }
 
         private void DrawTransition(Transition transition, Color color)
         {
             Handles.color = color;
-            Vector2 posStart = EventGroup.GetNode(transition.StartNode).Position+_nodeSize/2;
-            Vector2 posEnd = EventGroup.GetNode(transition.EndNode).Position + _nodeSize / 2;
+            EventNode startNode = EventGroup.GetNode(transition.StartNode);
+            int selectionCount = startNode.Selections.Count;
+            int selectionRectWidth = (int)_nodeSize.x / selectionCount;
+            Vector2 posStart = startNode.Position + new Vector2(selectionRectWidth * transition.TransitionType + selectionRectWidth / 2, _nodeSize.y * 3 / 4);
+            Vector2 posEnd = EventGroup.GetNode(transition.EndNode).Position + new Vector2(_nodeSize.x/2, _nodeSize.y/4);
             Handles.DrawBezier(posStart + _offset, posEnd + _offset, posStart + _offset, posEnd + _offset, color, NodeStyles.connectionTexture, 3f);
             DrawArrow(posStart+_offset, posEnd+_offset);
         }
 
-        private void DrawTransitionToMouse(int nodeID, Vector2 posMouse, Color color)
+        private void DrawTransitionToMouse()
         {
+            Color color = SelectionColors[_currentTransitionType];
             Handles.color = color;
-            Vector2 posStart = EventGroup.GetNode(nodeID).Position + _nodeSize / 2;
+            Vector2 posMouse = Event.current.mousePosition;
+            int selectionCount = _selectedNode.Selections.Count;
+            int selectionRectWidth = (int)_nodeSize.x/selectionCount;
+            Vector2 posStart = _selectedNode.Position+new Vector2(selectionRectWidth*_currentTransitionType+selectionRectWidth/2, _nodeSize.y*3/4);
             Handles.DrawBezier(posStart + _offset, posMouse, posStart + _offset, posMouse, color, NodeStyles.connectionTexture, 3f);
             DrawArrow(posStart + _offset, posMouse);
         }
