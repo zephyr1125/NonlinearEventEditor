@@ -33,7 +33,7 @@ namespace Dajiagame.NonlinearEvent
             /// <summary>
             /// 选项文本
             /// </summary>
-            public string Text;
+            public string Text = "";
             /// <summary>
             /// 对数据的影响
             /// </summary>

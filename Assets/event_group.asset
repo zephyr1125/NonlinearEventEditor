@@ -32,7 +32,7 @@ MonoBehaviour:
   ListNodes:
   - ID: 1
     CharacterID: 1
-    Text: "\u6587\u672C"
+    Text: "\u5317\u65B9\u7684\u4EBA\u6C11\u8FF7\u4FE1\u800C\u4E0D\u8654\u8BDA\uFF0C\u662F\u5426\u4FEE\u5EFA\u66F4\u591A\u6559\u5802\uFF1F"
     Selections:
     - Text: "\uFF08\u6447\u5934\uFF09"
       Effects: 02000000200000000a000000f6fffffffbffffff
@@ -79,16 +79,16 @@ MonoBehaviour:
     Requires: ffffffffffffffffffffffffffffffffffffffff
     Position: {x: 0, y: 192}
   - ID: 10
-    CharacterID: 0
-    Text: "\u6587\u672C"
+    CharacterID: 1
+    Text: "\u592A\u591A\u4EBA\u4FE1\u4EF0\u540C\u4E00\u4E2A\u5B97\u6559\u4E86\uFF01\u8FD9\u5F88\u5371\u9669\uFF0C\u965B\u4E0B\uFF01"
     Selections:
-    - Text: 
-      Effects: 0000000000000000000000000000000000000000
-      NextEventID: 0
-    - Text: 
-      Effects: 0000000000000000000000000000000000000000
-      NextEventID: 0
-    Requires: ffffffffffffffffffffffffffffffffffffffff
+    - Text: "\u6CA1\u5173\u7CFB\uFF0C\u65E9\u7740\u5462"
+      Effects: 0000000000000000fbffffff00000000000000000000000000000000
+      NextEventID: 12
+    - Text: "\u55EF\uFF0C\u7ACB\u523B\u5904\u7406\u3002"
+      Effects: 00000000000000000500000000000000000000000000000000000000
+      NextEventID: 13
+    Requires: ffffffffffffffffffffffffffffffffffffffffffffffffffffffff
     Position: {x: 512, y: 192}
   - ID: 11
     CharacterID: 0
@@ -102,3 +102,27 @@ MonoBehaviour:
       NextEventID: 0
     Requires: ffffffffffffffffffffffffffffffffffffffff
     Position: {x: 256, y: 192}
+  - ID: 12
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 0000000000000000000000000000000000000000
+      NextEventID: 0
+    - Text: 
+      Effects: 0000000000000000000000000000000000000000
+      NextEventID: 0
+    Requires: ffffffffffffffffffffffffffffffffffffffff
+    Position: {x: 384, y: 384}
+  - ID: 13
+    CharacterID: 0
+    Text: "\u6587\u672C"
+    Selections:
+    - Text: 
+      Effects: 0000000000000000000000000000000000000000
+      NextEventID: 0
+    - Text: 
+      Effects: 0000000000000000000000000000000000000000
+      NextEventID: 0
+    Requires: ffffffffffffffffffffffffffffffffffffffff
+    Position: {x: 640, y: 384}

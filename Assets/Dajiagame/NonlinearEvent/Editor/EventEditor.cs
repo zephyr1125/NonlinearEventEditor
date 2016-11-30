@@ -23,6 +23,20 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private int _widthRight = 256;
 
+        private Vector2 Offset
+        {
+            get { return _offset; }
+            set
+            {
+                _offset = value;
+                float rightMax = 0 - (_canvasRect.width - (position.width - _widthRight));
+                float downMax = 0 - (_canvasRect.height - position.height);
+                if (_offset.x > 0) _offset.x = 0;
+                if (_offset.x < rightMax) _offset.x = rightMax;
+                if (_offset.y > 0) _offset.y = 0;
+                if (_offset.y < downMax) _offset.y = downMax;
+            }
+        }
         private Vector2 _offset = Vector2.zero;
 
         private GUISkin _skin;
@@ -50,7 +64,7 @@ namespace Dajiagame.NonlinearEvent.Editor
         private State _state;
 
         private Color[] SelectionColors = {
-            new Color(1,0.6f,0.6f), 
+            new Color(1,0.7f,0.7f), 
             Color.green
         };
 
@@ -69,6 +83,18 @@ namespace Dajiagame.NonlinearEvent.Editor
              GetWindow<EventEditor>("非线性事件编辑器");
         }
 
+        void Awake()
+        {
+            if (EventGroup != null && EventGroup.ListNodes.Count > 0)
+            {
+                OffsetBackToRoot();
+            }
+            else
+            {
+                Offset = -new Vector2(position.width / 2, 0);
+            }
+        }
+
         void OnEnable()
         {
             Instance = this;
@@ -79,6 +105,7 @@ namespace Dajiagame.NonlinearEvent.Editor
         void OnGUI()
         {
             Background();
+            OffsetBackToRoot();
             GUI.skin = _skin;
             ShowRightMouseMenu();
             Transitions();
@@ -86,6 +113,25 @@ namespace Dajiagame.NonlinearEvent.Editor
             DrawRightPanel();
             GUI.skin = null;
             Repaint();
+        }
+
+        private void OffsetBackToRoot()
+        {
+            Event currentEvent = Event.current;
+            if (currentEvent == null) return;
+            switch (currentEvent.type) {
+                case EventType.KeyUp:
+                    if (currentEvent.keyCode == KeyCode.Home)
+                    {
+                        Debug.Log("Home");
+                        if (EventGroup == null) return;
+                        if(EventGroup.ListNodes.Count==0)return;
+                        Vector2 rootPos = EventGroup.ListNodes[0].Position;
+                        float winWidth = position.width - _widthRight;
+                        Offset = -new Vector2(rootPos.x- winWidth/2, rootPos.y);
+                    }
+                    break;
+            }
         }
 
         private void DrawEventNodes()
@@ -204,7 +250,7 @@ namespace Dajiagame.NonlinearEvent.Editor
                 case EventType.MouseDrag:
                     if (Event.current.button == 2) {
                         //中键拖拽整个工作区
-                        _offset += Event.current.delta;
+                        Offset += Event.current.delta;
                     }
                     break;
 
@@ -213,7 +259,7 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void DrawBackground()
         {
-            Rect drawRect = new Rect(_canvasRect.position + _offset, _canvasRect.size);
+            Rect drawRect = new Rect(_canvasRect.position + Offset, _canvasRect.size);
             GUIStyle canvasBackground = "flow background";
             canvasBackground.Draw(drawRect, false, false, false, false);
             Utils.DrawGrid(drawRect, _gridSize);
@@ -226,7 +272,7 @@ namespace Dajiagame.NonlinearEvent.Editor
         private Rect GetNodeDrawRect(EventNode node)
         {
             Rect controlRect = new Rect(node.Position, _nodeSize);
-            return new Rect(controlRect.position + _offset, controlRect.size);
+            return new Rect(controlRect.position + Offset, controlRect.size);
         }
 
         private bool PointInNodeDrawRect(EventNode node, Vector2 point)
@@ -278,11 +324,18 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private void DrawNode(EventNode node, Rect controlRect)
         {
-            if (node == _selectedNode) {
-                GUI.color = Color.cyan;
+            GUIStyle guiStyle;
+            if (node == _selectedNode)
+            {
+                guiStyle = _skin.GetStyle("NodeSelected");
             }
+            else
+            {
+                guiStyle = _skin.GetStyle("Node");
+            }
+
             Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);       
-            GUI.Label(drawRect, "", _skin.GetStyle("Node"));
+            GUI.Label(drawRect, "", guiStyle);
 
             int height = 18;
             int y = (int)drawRect.y;
@@ -310,8 +363,6 @@ namespace Dajiagame.NonlinearEvent.Editor
                     UpdateSelectedNodeSelectionRect(i, rect);
                 }
             }
-
-            GUI.color = Color.white;
         }
 
         private void DrawRequiresInNode(EventNode node, Rect drawRect)
@@ -476,7 +527,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             if (EventGroup != null) {
                 menu.AddItem(new GUIContent("新建节点"), false, delegate
                 {
-                    CreateNewNode(currentEvent.mousePosition-_offset);
+                    CreateNewNode(currentEvent.mousePosition- Offset);
                 });
                 menu.AddItem(new GUIContent("调整设置"), false, EditConfigFile);
                 menu.AddSeparator("");
@@ -666,8 +717,8 @@ namespace Dajiagame.NonlinearEvent.Editor
             int selectionRectWidth = (int)_nodeSize.x / selectionCount;
             Vector2 posStart = startNode.Position + new Vector2(selectionRectWidth * transition.TransitionType + selectionRectWidth / 2, _nodeSize.y * 3 / 4);
             Vector2 posEnd = EventGroup.GetNode(transition.EndNode).Position + new Vector2(_nodeSize.x/2, _nodeSize.y/4);
-            Handles.DrawBezier(posStart + _offset, posEnd + _offset, posStart + _offset, posEnd + _offset, color, NodeStyles.connectionTexture, 3f);
-            DrawArrow(posStart+_offset, posEnd+_offset);
+            Handles.DrawBezier(posStart + Offset, posEnd + Offset, posStart + Offset, posEnd + Offset, color, NodeStyles.connectionTexture, 3f);
+            DrawArrow(posStart+ Offset, posEnd+ Offset);
         }
 
         private void DrawTransitionToMouse()
@@ -678,8 +729,8 @@ namespace Dajiagame.NonlinearEvent.Editor
             int selectionCount = _selectedNode.Selections.Count;
             int selectionRectWidth = (int)_nodeSize.x/selectionCount;
             Vector2 posStart = _selectedNode.Position+new Vector2(selectionRectWidth*_currentTransitionType+selectionRectWidth/2, _nodeSize.y*3/4);
-            Handles.DrawBezier(posStart + _offset, posMouse, posStart + _offset, posMouse, color, NodeStyles.connectionTexture, 3f);
-            DrawArrow(posStart + _offset, posMouse);
+            Handles.DrawBezier(posStart + Offset, posMouse, posStart + Offset, posMouse, color, NodeStyles.connectionTexture, 3f);
+            DrawArrow(posStart + Offset, posMouse);
         }
 
         private void DrawArrow(Vector2 posStart, Vector2 posEnd)
