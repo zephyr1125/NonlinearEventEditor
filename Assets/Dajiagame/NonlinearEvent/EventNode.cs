@@ -19,6 +19,12 @@ namespace Dajiagame.NonlinearEvent
         public List<Selection> Selections = new List<Selection>();
 
         /// <summary>
+        /// 解锁本事件的数据需求
+        /// WARNING 注意由于有死亡事件是以某数值到0为条件的，因此这里只能以-1为默认值
+        /// </summary>
+        public List<int> Requires;
+
+        /// <summary>
         /// 选项子类
         /// </summary>
         [Serializable]
@@ -44,6 +50,15 @@ namespace Dajiagame.NonlinearEvent
                 {
                     Effects.Add(0);
                 }
+            }
+        }
+
+        public EventNode(int effectCount)
+        {
+            Requires = new List<int>(effectCount);
+            while (Requires.Count < effectCount) {
+                //require的默认值填-1
+                Requires.Add(-1);
             }
         }
 

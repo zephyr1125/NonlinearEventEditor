@@ -1254,7 +1254,7 @@ MonoBehaviour:
   - m_Name: Title
     m_Normal:
       m_Background: {fileID: 2800000, guid: 85623f85c678b5b4e9edd0fb3c472316, type: 3}
-      m_TextColor: {r: 0.625, g: 0.625, b: 0.625, a: 1}
+      m_TextColor: {r: 0.6876268, g: 1, b: 0.58823526, a: 1}
     m_Hover:
       m_Background: {fileID: 0}
       m_TextColor: {r: 0, g: 0, b: 0, a: 1}
@@ -1602,7 +1602,7 @@ MonoBehaviour:
   - m_Name: EffectNum
     m_Normal:
       m_Background: {fileID: 2800000, guid: 486cfbcaf927e114f89491cf8d4dd9f7, type: 3}
-      m_TextColor: {r: 0.5955882, g: 0.5955882, b: 0.5955882, a: 1}
+      m_TextColor: {r: 0.9117647, g: 0.9117647, b: 0.9117647, a: 1}
     m_Hover:
       m_Background: {fileID: 0}
       m_TextColor: {r: 0, g: 0, b: 0, a: 1}
@@ -1644,9 +1644,9 @@ MonoBehaviour:
       m_Right: 0
       m_Top: 0
       m_Bottom: 0
-    m_Font: {fileID: 0}
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 12
-    m_FontStyle: 1
+    m_FontStyle: 0
     m_Alignment: 4
     m_WordWrap: 0
     m_RichText: 1

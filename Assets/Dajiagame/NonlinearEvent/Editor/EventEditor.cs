@@ -19,6 +19,8 @@ namespace Dajiagame.NonlinearEvent.Editor
 
         private Vector2 _rootNodePositon = new Vector2(256, 128);
 
+        private Vector2 _effectDrawSize = new Vector2(38, 18);
+
         private int _widthRight = 256;
 
         private Vector2 _offset = Vector2.zero;
@@ -136,10 +138,8 @@ namespace Dajiagame.NonlinearEvent.Editor
             GUILayout.BeginArea(rightRect, _skin.GetStyle("Right"));
             EditorGUILayout.BeginVertical();
             {
-                GUILayout.Label("设置节点数据",_skin.GetStyle("Title"));
-                _selectedNode.CharacterID = EditorGUILayout.Popup("说话者", _selectedNode.CharacterID, _popUpCharacterNames);
-                GUILayout.Label("主文本");
-                _selectedNode.Text = EditorGUILayout.TextField(_selectedNode.Text, _skin.GetStyle("Talk"), GUILayout.Height(128));
+                DrawRightPanelRequires();
+                DrawRightPanelTalk();
                 for (int i = 0; i < _selectedNode.Selections.Count; i++)
                 {
                     DrawRightPanelSelection(i);
@@ -149,21 +149,46 @@ namespace Dajiagame.NonlinearEvent.Editor
             GUILayout.EndArea();
         }
 
+        private void DrawRightPanelRequires()
+        {
+            GUILayout.Label("解锁条件", _skin.GetStyle("Title"));
+            DrawEffectGroup(_selectedNode.Requires, -1);
+        }
+
+        private void DrawRightPanelTalk()
+        {
+            GUILayout.Label("设置文本", _skin.GetStyle("Title"));
+            _selectedNode.CharacterID = EditorGUILayout.Popup("说话者", _selectedNode.CharacterID, _popUpCharacterNames);
+            GUILayout.Label("文本内容");
+            _selectedNode.Text = EditorGUILayout.TextField(_selectedNode.Text, _skin.GetStyle("Talk"), GUILayout.Height(128));
+        }
+
         private void DrawRightPanelSelection(int selectionID)
         {
             GUILayout.Label("选项"+(selectionID+1)+"设置", _skin.GetStyle("Title"));
             GUILayout.Label("选项文本");
             _selectedNode.Selections[selectionID].Text = GUILayout.TextField(
                 _selectedNode.Selections[selectionID].Text, _skin.GetStyle("Talk"));
-            for (int i = 0; i < EventGroup.Config.Effects.Count; i++)
-            {
-                while (_selectedNode.Selections[selectionID].Effects.Count <= i)
-                {
-                    _selectedNode.Selections[selectionID].Effects.Add(0);
+            DrawEffectGroup(_selectedNode.Selections[selectionID].Effects, 0);
+        }
+
+        /// <summary>
+        /// 绘制一组Effect数据
+        /// </summary>
+        /// <param name="effects"></param>
+        /// <param name="defaultNum">如果节点的Effect数组不够长，以defaultNum填充</param>
+        private void DrawEffectGroup(List<int> effects, int defaultNum)
+        {
+            for (int i = 0; i < EventGroup.Config.Effects.Count; i++) {
+                if (i % 2 == 0) EditorGUILayout.BeginHorizontal();
+                while (effects.Count <= i) {
+                    effects.Add(defaultNum);
                 };
-                _selectedNode.Selections[selectionID].Effects[i] = EditorGUILayout.IntField(
-                new GUIContent(EventGroup.Config.Effects[i].Name, EventGroup.Config.Effects[i].Icon),
-                _selectedNode.Selections[selectionID].Effects[i]);
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(new GUIContent(EventGroup.Config.Effects[i].Name, EventGroup.Config.Effects[i].Icon), GUILayout.Width(48));
+                effects[i] = EditorGUILayout.IntField(effects[i], GUILayout.Width(48));
+                EditorGUILayout.EndHorizontal();
+                if (i % 2 == 1 || i == EventGroup.Config.Effects.Count - 1) EditorGUILayout.EndHorizontal();
             }
         }
 
@@ -259,11 +284,12 @@ namespace Dajiagame.NonlinearEvent.Editor
             Rect drawRect = new Rect(controlRect.x + 16, controlRect.y + 16, controlRect.width - 32, controlRect.height - 32);       
             GUI.Label(drawRect, "", _skin.GetStyle("Node"));
 
-            int height = 24;
+            int height = 18;
             int y = (int)drawRect.y;
             
             GUI.Label(new Rect(drawRect.x, y, 24, height), ""+node.ID, _skin.GetStyle("ID"));
-            
+
+            DrawRequiresInNode(node, new Rect(drawRect.x + 23, y, drawRect.width-24, height));
 
             y += height - 1;
             height = 64;
@@ -286,6 +312,18 @@ namespace Dajiagame.NonlinearEvent.Editor
             }
 
             GUI.color = Color.white;
+        }
+
+        private void DrawRequiresInNode(EventNode node, Rect drawRect)
+        {
+            int p = 1;
+            for (int i = EventGroup.Config.Effects.Count - 1; i >= 0; i--)
+            {
+                if (node.Requires[i] == -1) continue;
+
+                DrawEffect(new Vector2(drawRect.x+drawRect.width-(_effectDrawSize.x-1)* p, drawRect.y), i, node.Requires[i]);
+                p++;
+            }
         }
 
         private Color GetSelectionColor(int selectionID)
@@ -333,12 +371,26 @@ namespace Dajiagame.NonlinearEvent.Editor
             {
                 int effect = selection.Effects[i];
                 if (effect == 0) continue;
-                var effectRect = new Rect(drawRect.x+(drawID % 3)*37, drawRect.y+17+((int)drawID / 3)*17, 38, 18);
-                GUI.Label(effectRect, "", _skin.GetStyle("Node"));
-                GUI.DrawTexture(new Rect(effectRect.x+1, effectRect.y+1, 16, 16), EventGroup.Config.Effects[i].Icon);
-                GUI.Label(new Rect(effectRect.x + 17, effectRect.y, 21, 18), ""+ effect, _skin.GetStyle("EffectNum"));
+                Vector2 pos = new Vector2(drawRect.x, drawRect.y + 17);
+                pos+=new Vector2((drawID % 3) * (_effectDrawSize.x-1), drawID / 3 * (_effectDrawSize.y - 1));
+                DrawEffect(pos, i, effect);
                 drawID++;
             }
+        }
+
+        /// <summary>
+        /// 绘制一组Effect数据
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="effectID"></param>
+        /// <param name="effectValue"></param>
+        /// <returns>返回绘制的Rect</returns>
+        private void DrawEffect(Vector2 pos, int effectID, int effectValue)
+        {
+            var effectRect = new Rect(pos, _effectDrawSize);
+            GUI.Label(effectRect, "", _skin.GetStyle("Node"));
+            GUI.DrawTexture(new Rect(effectRect.x + 1, effectRect.y + 1, 16, 16), EventGroup.Config.Effects[effectID].Icon);
+            GUI.Label(new Rect(effectRect.x + 17, effectRect.y, _effectDrawSize.x-17, _effectDrawSize.y), "" + effectValue, _skin.GetStyle("EffectNum"));
         }
 
         private void ShowNodeMenu()
@@ -397,9 +449,9 @@ namespace Dajiagame.NonlinearEvent.Editor
                 EventGroup.ListNodes = new List<EventNode>();
                 _lastEventID = 1;
             }
-            EventNode newNode = new EventNode
+            EventNode newNode = new EventNode(EventGroup.Config.Effects.Count)
             {
-                ID =  _lastEventID,
+                ID = _lastEventID,
                 Position = createAt
             };
             for (int i = 0; i < EventGroup.Config.DefaultSelectionCount; i++)
