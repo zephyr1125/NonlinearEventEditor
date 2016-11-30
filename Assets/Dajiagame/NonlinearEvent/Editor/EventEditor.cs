@@ -58,6 +58,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             ConnectTransition
         }
 
+        [SerializeField]
         private string[] _popUpCharacterNames;
 
         [MenuItem("DajiaGame/非线性事件编辑器")]
