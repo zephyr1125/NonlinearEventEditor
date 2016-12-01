@@ -17,6 +17,10 @@ namespace Dajiagame.NonlinearEvent
 
         public int GetLastEventID()
         {
+            if (ListNodes == null || ListNodes.Count == 0)
+            {
+                return 0;
+            }
             return ListNodes.Max(_ => _.ID);
         }
     }

@@ -370,7 +370,7 @@ namespace Dajiagame.NonlinearEvent.Editor
             int p = 1;
             for (int i = EventGroup.Config.Effects.Count - 1; i >= 0; i--)
             {
-                if (node.Requires[i] == -1) continue;
+                if (node.Requires.Count<=i || node.Requires[i] == -1) continue;
 
                 DrawEffect(new Vector2(drawRect.x+drawRect.width-(_effectDrawSize.x-1)* p, drawRect.y), i, node.Requires[i]);
                 p++;
@@ -438,6 +438,7 @@ namespace Dajiagame.NonlinearEvent.Editor
         /// <returns>返回绘制的Rect</returns>
         private void DrawEffect(Vector2 pos, int effectID, int effectValue)
         {
+            if (EventGroup.Config.Effects.Count <= effectID) return;
             var effectRect = new Rect(pos, _effectDrawSize);
             GUI.Label(effectRect, "", _skin.GetStyle("Node"));
             GUI.DrawTexture(new Rect(effectRect.x + 1, effectRect.y + 1, 16, 16), EventGroup.Config.Effects[effectID].Icon);
@@ -562,10 +563,13 @@ namespace Dajiagame.NonlinearEvent.Editor
             if (string.IsNullOrEmpty(path)) {
                 return;
             }
+            ConfigEditor.CloseWindow();
             EventGroup = CreateInstance<NonlinearEventGroup>();
             _eventGroupFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
             AssetDatabase.CreateAsset(EventGroup, _eventGroupFilePath);
             AssetDatabase.SaveAssets();
+            ResetTransitions();
+            _selectedNode = null;
             EditConfigFile();
         }
 
@@ -575,10 +579,12 @@ namespace Dajiagame.NonlinearEvent.Editor
             if (string.IsNullOrEmpty(path)) {
                 return;
             }
+            ConfigEditor.CloseWindow();
             _eventGroupFilePath = Utils.AbsolutePathToAssetDataBasePath(path);
             EventGroup = AssetDatabase.LoadAssetAtPath<NonlinearEventGroup>(_eventGroupFilePath);
             _lastEventID = EventGroup.GetLastEventID() + 1;
             ReloadTransitions();
+            _selectedNode = null;
             UpdatePopUpCharacterNames();
         }
 
@@ -592,9 +598,14 @@ namespace Dajiagame.NonlinearEvent.Editor
             }
         }
 
-        private void ReloadTransitions()
+        private void ResetTransitions()
         {
             _listTransitions = new List<Transition>();
+        }
+
+        private void ReloadTransitions()
+        {
+            ResetTransitions();
             if (EventGroup == null)
             {
                 return;

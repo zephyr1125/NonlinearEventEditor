@@ -5,12 +5,18 @@ namespace Dajiagame.NonlinearEvent.Editor
 {
     public class ConfigEditor : EditorWindow
     {
+
+        public static ConfigEditor Instance;
+
+        private NonlinearEventGroup _eventGroup;
         private Config _config;
         private Texture2D _newEffectIcon;
 
         void Awake()
         {
-            _config = EventEditor.Instance.EventGroup.Config;
+            Instance = this;
+            _eventGroup = EventEditor.Instance.EventGroup;
+            _config = _eventGroup.Config;
             position = new Rect(160, 160, 360, 640);
         }
 
@@ -51,7 +57,7 @@ namespace Dajiagame.NonlinearEvent.Editor
                     _config.Effects[i].Icon = (Texture2D)EditorGUILayout.ObjectField(_config.Effects[i].Icon, typeof(Texture2D), false, GUILayout.Width(48), GUILayout.Height(48));
                     //移除按钮
                     if (GUILayout.Button("-", GUILayout.Width(48), GUILayout.Height(16))) {
-                        _config.Effects.RemoveAt(i);
+                        RemoveAEffect(i);
                     }
                 }
             }
@@ -82,5 +88,28 @@ namespace Dajiagame.NonlinearEvent.Editor
             EventEditor.Instance.UpdatePopUpCharacterNames();
         }
 
+        private void RemoveAEffect(int ID)
+        {
+            _config.Effects.RemoveAt(ID);
+            //所有现有节点对应调整Require和Effect数据
+            if (_eventGroup.ListNodes == null) return;
+            foreach (var eventNode in _eventGroup.ListNodes)
+            {
+                if(eventNode.Requires.Count>ID)eventNode.Requires.RemoveAt(ID);
+                foreach (var selection in eventNode.Selections)
+                {
+                    if (selection.Effects.Count > ID) selection.Effects.RemoveAt(ID);  
+                }
+            }
+        }
+
+        public static void CloseWindow()
+        {
+            if (Instance != null)
+            {
+                Instance.Close();
+                Instance = null;
+            }
+        }
     }
 }
